@@ -127,3 +127,141 @@ export function ScrollMeter() {
     </div>
   );
 }
+
+/* ---------- sound ---------- */
+let audioOn = false;
+let ctx: AudioContext | null = null;
+export function blip(freq = 660, dur = 0.06) {
+  if (!audioOn) return;
+  ctx ??= new AudioContext();
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.type = "sine";
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(0.05, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+  o.connect(g).connect(ctx.destination);
+  o.start();
+  o.stop(ctx.currentTime + dur);
+}
+
+export function SoundToggle() {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    let last: Element | null = null;
+    const over = (e: MouseEvent) => {
+      const t = (e.target as HTMLElement).closest("a,button,[data-hover]");
+      if (t && t !== last) blip(520 + Math.random() * 400, 0.05);
+      last = t;
+    };
+    window.addEventListener("mouseover", over);
+    return () => window.removeEventListener("mouseover", over);
+  }, []);
+  return (
+    <button
+      onClick={() => { audioOn = !on; setOn(!on); if (!on) setTimeout(() => blip(880, 0.12), 10); }}
+      className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full border border-border bg-card/90 px-3 py-2 font-mono text-[11px] shadow-polaroid backdrop-blur"
+      aria-label="Toggle sound"
+    >
+      <span className="flex h-3 items-end gap-[2px]">
+        {[0, 1, 2, 3].map((i) => (
+          <span key={i} className={`w-[2px] rounded-full bg-signal ${on ? "animate-eq" : ""}`} style={{ height: on ? undefined : 3, animationDelay: `${i * 120}ms` }} />
+        ))}
+      </span>
+      sound {on ? "on" : "off"}
+    </button>
+  );
+}
+
+/* ---------- magnetic ---------- */
+export function Magnetic({ children, strength = 0.35, className = "" }: { children: ReactNode; strength?: number; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [t, setT] = useState({ x: 0, y: 0 });
+  return (
+    <div
+      ref={ref}
+      className={`inline-block transition-transform duration-300 ease-out ${className}`}
+      style={{ transform: `translate(${t.x}px, ${t.y}px)` }}
+      onMouseMove={(e) => {
+        const r = ref.current!.getBoundingClientRect();
+        setT({ x: (e.clientX - r.left - r.width / 2) * strength, y: (e.clientY - r.top - r.height / 2) * strength });
+      }}
+      onMouseLeave={() => setT({ x: 0, y: 0 })}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ---------- confetti ---------- */
+export function confetti(x: number, y: number) {
+  const colors = ["var(--signal)", "var(--ink)", "var(--paper)", "oklch(0.8 0.14 85)"];
+  blip(990, 0.15);
+  for (let i = 0; i < 36; i++) {
+    const s = document.createElement("span");
+    const a = Math.random() * Math.PI * 2;
+    const d = 80 + Math.random() * 160;
+    s.style.cssText = `position:fixed;left:${x}px;top:${y}px;width:8px;height:${6 + Math.random() * 8}px;background:${colors[i % 4]};border-radius:2px;pointer-events:none;z-index:200;box-shadow:0 0 0 1px oklch(0 0 0 / .08)`;
+    document.body.appendChild(s);
+    s.animate(
+      [
+        { transform: "translate(-50%,-50%) rotate(0)", opacity: 1 },
+        { transform: `translate(${Math.cos(a) * d}px, ${Math.sin(a) * d + 120}px) rotate(${Math.random() * 720}deg)`, opacity: 0 },
+      ],
+      { duration: 900 + Math.random() * 500, easing: "cubic-bezier(.2,.7,.3,1)" },
+    ).onfinish = () => s.remove();
+  }
+}
+
+/* ---------- floating 3D icon ---------- */
+export function FloatIcon({ src, alt, className = "", delay = 0 }: { src: string; alt: string; className?: string; delay?: number }) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      width={512}
+      height={512}
+      loading="lazy"
+      data-hover
+      className={`animate-bob select-none drop-shadow-[0_18px_20px_oklch(0.2_0.01_60/0.25)] transition-transform duration-500 hover:rotate-12 hover:scale-110 ${className}`}
+      style={{ animationDelay: `${delay}s` }}
+      draggable={false}
+    />
+  );
+}
+
+/* ---------- live status ---------- */
+export function StatusWidget() {
+  const [time, setTime] = useState<string | null>(null);
+  const [open, setOpen] = useState(true);
+  useEffect(() => {
+    const f = () => setTime(new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true }).format(new Date()));
+    f();
+    const id = setInterval(f, 1000);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div className="fixed bottom-5 left-5 z-50 hidden md:block">
+      <button
+        onClick={() => setOpen(!open)}
+        className={`overflow-hidden rounded-2xl border border-border bg-card/90 text-left shadow-float backdrop-blur transition-all duration-500 ${open ? "w-64 p-4" : "w-auto px-3 py-2"}`}
+      >
+        <div className="flex items-center gap-2 font-mono text-[11px]">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-signal opacity-60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-signal" />
+          </span>
+          open to work
+          {!open && <span className="text-muted-foreground">· {time ?? "--:--"}</span>}
+        </div>
+        {open && (
+          <div className="mt-3 space-y-2 text-xs">
+            <div className="flex justify-between"><span className="text-muted-foreground">mumbai</span><span className="font-mono">{time ?? "--:--"}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">building</span><span>TRINETRA v2</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">fuel</span><span>cutting chai ☕</span></div>
+          </div>
+        )}
+      </button>
+    </div>
+  );
+}
