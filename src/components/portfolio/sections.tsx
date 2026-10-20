@@ -251,7 +251,7 @@ export function Skills() {
           {Object.entries(skills).map(([cat, list], i) => {
             const big = cat === "Languages";
             return (
-              <Reveal key={cat} delay={i * 80} className={spans[cat]}>
+              <Reveal key={cat} delay={i * 80} className={spans[cat] ?? ""}>
                 <Tilt max={8} className="h-full rounded-3xl" style={{ height: "100%" }}>
                   <div data-hover className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-border p-6 shadow-polaroid transition-colors duration-500 ${big ? "bg-ink text-ink-foreground" : "bg-card hover:bg-paper"}`}>
                     <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" style={{ background: "var(--gradient-glow)" }} />
