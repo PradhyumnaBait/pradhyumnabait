@@ -211,8 +211,9 @@ export function Manifesto() {
 export function Work() {
   const previews: Record<string, string> = { moksha: pvMoksha, meddesk: pvMeddesk, trinetra: pvTrinetra };
   const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
   return (
-    <section id="work" className="relative bg-ink px-6 pb-32 pt-10 text-ink-foreground">
+    <section id="work" className="relative bg-ink px-4 pb-24 pt-10 text-ink-foreground md:px-6 md:pb-32">
       <div
         className="pointer-events-none fixed left-0 top-0 z-30 hidden w-72 overflow-hidden rounded-2xl border border-ink-foreground/20 shadow-float transition-[opacity,scale] duration-300 lg:block"
         style={{ opacity: hover ? 1 : 0, scale: hover ? "1" : "0.6", transform: `translate(${(hover?.x ?? 0) + 24}px, ${(hover?.y ?? 0) + 24}px) rotate(-4deg)` }}
@@ -278,7 +279,8 @@ export function Work() {
                 </article>
               </Tilt>
             </Reveal>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
