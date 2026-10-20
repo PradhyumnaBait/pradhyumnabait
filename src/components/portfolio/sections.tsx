@@ -45,7 +45,7 @@ export function Hero() {
           <h1 className="mt-6">
             <span className="animate-rise block font-serif text-6xl italic md:text-7xl" style={{ animationDelay: "100ms" }}>hey, I'm</span>
             <span
-              className="animate-rise relative block text-[17vw] font-extrabold leading-[0.85] tracking-[-0.06em] lg:text-[9.5rem]"
+              className="animate-rise relative block text-[15vw] font-extrabold leading-[0.85] tracking-[-0.06em] lg:text-[8.5rem]"
               style={{ animationDelay: "250ms", transform: `translate(${m.x * -14}px, ${m.y * -8}px)` }}
             >
               pradhyumna<span className="text-signal">.</span>
