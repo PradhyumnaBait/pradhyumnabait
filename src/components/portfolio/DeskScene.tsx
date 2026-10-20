@@ -41,7 +41,7 @@ function Item({ id, active, onHover, onSelect, children, position, pin }: {
       position={position}
       onPointerOver={(e) => { if (e.pointerType !== "mouse") return; e.stopPropagation(); onHover(id); document.body.style.cursor = "pointer"; }}
       onPointerOut={(e) => { if (e.pointerType !== "mouse") return; onHover(null); document.body.style.cursor = ""; }}
-      onClick={(e) => { e.stopPropagation(); onSelect(id); }}
+      onClick={(e) => { e.stopPropagation(); if (e.pointerType === "mouse") onHover(id); else onSelect(id); }}
     >
       {children}
       <Html position={[0, pin, 0]} center zIndexRange={[20, 0]}>
@@ -337,7 +337,7 @@ function Rig() {
   useEffect(() => {
     const narrow = size.width < 640;
     const cam = camera as THREE.PerspectiveCamera;
-    cam.position.set(0, narrow ? 8.5 : 5, narrow ? 12 : 8.6);
+    cam.position.set(0, narrow ? 7.4 : 5, narrow ? 10.2 : 8.6);
     cam.fov = narrow ? 46 : 38;
     cam.lookAt(0, -0.2, 0);
     cam.updateProjectionMatrix();

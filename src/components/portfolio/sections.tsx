@@ -118,7 +118,7 @@ export function Toolkit() {
         </p>
       </Reveal>
       <div className="relative w-full max-w-6xl">
-        <div className="relative h-[22rem] w-full sm:h-[28rem] md:h-[36rem]">
+        <div className="relative h-[25rem] w-full sm:h-[28rem] md:h-[36rem]">
           {mounted && (
             <Suspense fallback={<div className="flex h-full items-center justify-center font-mono text-xs text-muted-foreground">setting up the desk…</div>}>
               <DeskScene active={active} onHover={setActive} onSelect={select} />
@@ -171,7 +171,7 @@ export function Toolkit() {
               key={d.id}
               type="button"
               onMouseEnter={(e) => { if (window.matchMedia("(hover: hover)").matches) setActive(d.id); void e; }}
-              onClick={() => select(d.id)}
+              onClick={() => (window.matchMedia("(hover: hover)").matches ? setActive(d.id) : select(d.id))}
               aria-pressed={on}
               className={`flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-2xl border p-2 transition-all duration-300 active:scale-95 ${on ? "-translate-y-1 border-signal bg-card shadow-polaroid" : "border-border bg-card/50"}`}
             >
