@@ -373,7 +373,7 @@ export function Journey() {
     <section className="px-6 py-24">
       <div className="mx-auto max-w-5xl">
         <Reveal><h2 className="text-5xl font-bold tracking-tight md:text-7xl">the <em className="font-serif font-normal">journey</em> so far</h2></Reveal>
-        <div ref={ref} className="relative mt-16 pb-[30vh]">
+        <div ref={ref} className="relative mt-16 pb-[8vh]">
           <div className="absolute left-6 top-0 h-full w-px bg-border md:left-1/2" />
           <div className="absolute left-6 top-0 w-[3px] -translate-x-px rounded-full bg-signal shadow-[0_0_16px_var(--signal)] md:left-1/2" style={{ height: `${Math.min(100, p * 140)}%` }} />
           <div className="space-y-24">
