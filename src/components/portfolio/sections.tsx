@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Github, Linkedin, Mail, Send, ArrowUp } from "lucide-react";
+import { ArrowUpRight, Github, Linkedin, Mail, Send, ArrowUp, Laptop, Cpu, Coffee, Sprout, Server, BookOpen, MousePointerClick, Plus } from "lucide-react";
+import { Cat } from "./Cat";
 import p1 from "@/assets/polaroid-1.jpg";
 import p2 from "@/assets/polaroid-2.jpg";
 import p3 from "@/assets/polaroid-3.jpg";
@@ -65,7 +66,7 @@ export function Hero() {
               style={{ animationDelay: "250ms", transform: `translate(${m.x * -14}px, ${m.y * -8}px)` }}
             >
               pradhyumna<span className="text-signal">.</span>
-              <span className="absolute -top-6 right-10 rotate-[-6deg] font-hand text-2xl font-medium tracking-normal text-signal">ok, you can stay ↓</span>
+              <Cat />
             </span>
           </h1>
         </div>
@@ -96,45 +97,89 @@ export function Hero() {
 }
 
 /** "but first —" section with an interactive 3D desk */
+const deskIcons: Record<string, typeof Laptop> = { laptop: Laptop, gpu: Cpu, mug: Coffee, plant: Sprout, server: Server, books: BookOpen };
 export function Toolkit() {
   const [active, setActive] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+  const select = (id: string) => setActive((a) => (a === id ? null : id));
   const item = deskItems.find((d) => d.id === active);
+  const Icon = item ? deskIcons[item.id] : null;
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center gap-6 overflow-hidden px-6 py-24 text-center">
+    <section className="relative flex min-h-screen flex-col items-center justify-center gap-6 overflow-hidden px-4 py-24 text-center md:px-6">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 opacity-50 blur-3xl" style={{ background: "radial-gradient(ellipse at 50% 80%, oklch(0.75 0.1 60 / .45), transparent 65%)" }} />
       <Reveal>
-        <h2 className="text-6xl font-bold leading-[0.95] tracking-tight md:text-8xl">
+        <h2 className="text-5xl font-bold leading-[0.95] tracking-tight sm:text-6xl md:text-8xl">
           but first —<br />welcome to my desk<span className="text-signal">.</span>
         </h2>
-        <p className="mt-4 font-hand text-2xl text-muted-foreground">(hover the things on it · drag to look around)</p>
+        <p className="mt-4 font-hand text-xl text-muted-foreground md:text-2xl">
+          <span className="hidden md:inline">(hover the things on it · drag to look around)</span>
+          <span className="md:hidden">(tap the glowing dots on the desk)</span>
+        </p>
       </Reveal>
-      <div className="relative h-[28rem] w-full max-w-5xl md:h-[34rem]">
-        {mounted && (
-          <Suspense fallback={<div className="flex h-full items-center justify-center font-mono text-xs text-muted-foreground">setting up the desk…</div>}>
-            <DeskScene active={active} onHover={setActive} />
-          </Suspense>
-        )}
-        <div className="pointer-events-none absolute left-1/2 top-2 -translate-x-1/2">
-          <div key={active ?? "none"} className="animate-rise rounded-2xl border border-border bg-card/90 px-5 py-3 shadow-polaroid backdrop-blur">
-            {item ? (
-              <>
-                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{item.label}</div>
-                <div className="text-2xl font-bold">{item.skill}<span className="text-signal">.</span></div>
-                <div className="font-hand text-lg text-muted-foreground">{item.note}</div>
-              </>
+      <div className="relative w-full max-w-6xl">
+        <div className="relative h-[22rem] w-full sm:h-[28rem] md:h-[36rem]">
+          {mounted && (
+            <Suspense fallback={<div className="flex h-full items-center justify-center font-mono text-xs text-muted-foreground">setting up the desk…</div>}>
+              <DeskScene active={active} onHover={setActive} onSelect={select} />
+            </Suspense>
+          )}
+        </div>
+
+        {/* info card: floating on desktop, below the desk on mobile */}
+        <div className="mx-auto mt-2 w-full max-w-sm md:pointer-events-none md:absolute md:left-4 md:top-4 md:mt-0 md:w-72">
+          <div key={active ?? "none"} className="animate-rise rounded-3xl border border-border bg-card/85 p-4 text-left shadow-polaroid backdrop-blur-md">
+            <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-signal" /> {item ? item.label : "on the desk"}
+              <span className="h-px flex-1 bg-border" />
+            </div>
+            {item && Icon ? (
+              <div className="mt-3 flex items-center gap-3">
+                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-signal text-accent-foreground shadow-polaroid"><Icon className="h-6 w-6" /></div>
+                <div className="min-w-0">
+                  <div className="truncate text-xl font-bold">{item.skill}<span className="text-signal">.</span></div>
+                  <div className="font-hand text-lg leading-tight text-muted-foreground">{item.note}</div>
+                </div>
+              </div>
             ) : (
-              <div className="font-hand text-xl text-muted-foreground">psst — point at something ↓</div>
+              <div className="mt-2 font-hand text-xl text-muted-foreground">six things, six skills. pick one ↓</div>
             )}
           </div>
         </div>
+
+        <div className="pointer-events-none absolute right-6 top-6 hidden rotate-[-8deg] text-left font-hand text-2xl leading-tight text-muted-foreground md:block">
+          build<br />&nbsp;&nbsp;create<br />&nbsp;&nbsp;&nbsp;&nbsp;solve →
+        </div>
+
+        {!active && (
+          <div className="pointer-events-none absolute bottom-4 left-1/2 hidden -translate-x-1/2 items-center gap-3 md:flex">
+            <span className="h-px w-10 bg-signal/50" />
+            <span className="rounded-full border border-signal/40 bg-card/80 px-5 py-2 font-mono text-[11px] uppercase tracking-[0.25em] text-signal shadow-polaroid backdrop-blur">
+              <MousePointerClick className="mr-2 inline h-3.5 w-3.5" />hover to explore
+            </span>
+            <span className="h-px w-10 bg-signal/50" />
+          </div>
+        )}
       </div>
-      <div className="flex flex-wrap justify-center gap-2">
-        {deskItems.map((d) => (
-          <button key={d.id} onMouseEnter={() => setActive(d.id)} onMouseLeave={() => setActive(null)} onClick={() => setActive(d.id)} className={`rounded-full border px-3 py-1 font-mono text-[11px] transition-all ${active === d.id ? "border-signal bg-signal text-accent-foreground" : "border-border text-muted-foreground"}`}>
-            {d.skill}
-          </button>
-        ))}
+
+      <div className="grid w-full max-w-3xl grid-cols-3 gap-2 sm:grid-cols-6">
+        {deskItems.map((d) => {
+          const I = deskIcons[d.id];
+          const on = active === d.id;
+          return (
+            <button
+              key={d.id}
+              type="button"
+              onMouseEnter={(e) => { if (window.matchMedia("(hover: hover)").matches) setActive(d.id); void e; }}
+              onClick={() => select(d.id)}
+              aria-pressed={on}
+              className={`flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-2xl border p-2 transition-all duration-300 active:scale-95 ${on ? "-translate-y-1 border-signal bg-card shadow-polaroid" : "border-border bg-card/50"}`}
+            >
+              <span className={`grid h-9 w-9 place-items-center rounded-xl transition-colors ${on ? "bg-signal text-accent-foreground" : "bg-muted text-foreground"}`}><I className="h-4 w-4" /></span>
+              <span className="font-mono text-[10px] leading-tight text-muted-foreground">{d.skill}</span>
+            </button>
+          );
+        })}
       </div>
     </section>
   );
