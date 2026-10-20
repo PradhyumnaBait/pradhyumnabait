@@ -337,9 +337,9 @@ function Rig() {
   useEffect(() => {
     const narrow = size.width < 640;
     const cam = camera as THREE.PerspectiveCamera;
-    cam.position.set(0, narrow ? 7.4 : 5, narrow ? 10.2 : 8.6);
+    cam.position.set(0, narrow ? 7 : 5, narrow ? 9.4 : 8.6);
     cam.fov = narrow ? 46 : 38;
-    cam.lookAt(0, -0.2, 0);
+    cam.lookAt(0, narrow ? -0.9 : -0.2, 0);
     cam.updateProjectionMatrix();
   }, [size.width, camera]);
   return null;
