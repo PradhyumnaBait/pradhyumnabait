@@ -41,7 +41,7 @@ function Item({ id, active, onHover, onSelect, children, position, pin }: {
       position={position}
       onPointerOver={(e) => { if (e.pointerType !== "mouse") return; e.stopPropagation(); onHover(id); document.body.style.cursor = "pointer"; }}
       onPointerOut={(e) => { if (e.pointerType !== "mouse") return; onHover(null); document.body.style.cursor = ""; }}
-      onClick={(e) => { e.stopPropagation(); if (e.pointerType === "mouse") onHover(id); else onSelect(id); }}
+      onClick={(e) => { e.stopPropagation(); if ((e.nativeEvent as PointerEvent).pointerType === "mouse") onHover(id); else onSelect(id); }}
     >
       {children}
       <Html position={[0, pin, 0]} center zIndexRange={[20, 0]}>
@@ -77,7 +77,7 @@ function drawCode(ctx: CanvasRenderingContext2D, n: number, on: boolean) {
     const segs = 2 + ((i * 3) % 3);
     for (let s = 0; s < segs; s++) {
       const w = 24 + ((i * 37 + s * 53) % 90);
-      ctx.fillStyle = PALETTE[(i + s * 2) % PALETTE.length];
+      ctx.fillStyle = PALETTE[(i + s * 2) % PALETTE.length]!;
       ctx.globalAlpha = 0.85;
       ctx.fillRect(x, y, w, 8);
       x += w + 8;
