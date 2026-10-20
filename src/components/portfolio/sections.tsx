@@ -229,34 +229,44 @@ export function Work() {
           </div>
           <span className="font-mono text-xs text-ink-muted">03 projects · more soon</span>
         </Reveal>
-        <div className="grid gap-8 lg:grid-cols-3">
-          {projects.map((pr, i) => (
+        <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
+          {projects.map((pr, i) => {
+            const open = openId === pr.id;
+            return (
             <Reveal key={pr.id} delay={i * 120}>
               <Tilt max={10} className="h-full rounded-3xl">
                 <article
                   data-hover
+                  data-on={open}
                   onMouseMove={(e) => setHover({ id: pr.id, x: e.clientX, y: e.clientY })}
                   onMouseLeave={() => setHover(null)}
-                  className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-ink-foreground/10 bg-ink-foreground/[0.04] p-7 shadow-float"
+                  className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border bg-ink-foreground/[0.04] p-5 shadow-float transition-colors md:p-7 ${open ? "border-signal/60" : "border-ink-foreground/10"}`}
                 >
-                  <div className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" style={{ background: "var(--gradient-glow)" }} />
+                  <div className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100 group-data-[on=true]:opacity-100" style={{ background: "var(--gradient-glow)" }} />
                   <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-widest text-ink-muted" style={{ transform: "translateZ(20px)" }}>
                     <span>0{i + 1}</span><span>{pr.kind}</span>
                   </div>
-                  <h3 className="mt-10 text-4xl font-extrabold tracking-tight" style={{ transform: "translateZ(50px)" }}>{pr.name}</h3>
-                  <p className="font-serif text-2xl italic text-ink-muted" style={{ transform: "translateZ(40px)" }}>{pr.tagline}</p>
-                  <img src={previews[pr.id]} alt={`${pr.name} preview`} width={976} height={688} loading="lazy" className="mt-6 aspect-video w-full rounded-xl object-cover lg:hidden" />
-                  <div className="my-8 grid grid-cols-2 gap-4" style={{ transform: "translateZ(60px)" }}>
+                  <button type="button" onClick={() => setOpenId(open ? null : pr.id)} className="relative mt-5 overflow-hidden rounded-2xl lg:hidden" aria-label={`${pr.name} details`}>
+                    <img src={previews[pr.id]} alt={`${pr.name} preview`} width={976} height={688} loading="lazy" className={`aspect-video w-full object-cover transition-transform duration-700 ${open ? "scale-105" : ""}`} />
+                    <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-ink/80 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-ink-foreground backdrop-blur">
+                      <Plus className={`h-3 w-3 transition-transform ${open ? "rotate-45" : ""}`} /> {open ? "less" : "tap for details"}
+                    </span>
+                  </button>
+                  <h3 className="mt-6 text-3xl font-extrabold tracking-tight md:text-4xl lg:mt-10" style={{ transform: "translateZ(50px)" }}>{pr.name}</h3>
+                  <p className="font-serif text-xl italic text-ink-muted md:text-2xl" style={{ transform: "translateZ(40px)" }}>{pr.tagline}</p>
+                  <div className="my-6 grid grid-cols-2 gap-3 md:my-8 md:gap-4" style={{ transform: "translateZ(60px)" }}>
                     {[pr.stat, pr.stat2].map((s) => (
-                      <div key={s.label} className="rounded-2xl border border-ink-foreground/10 p-4">
-                        <div className="text-2xl font-bold text-signal">{s.value}</div>
+                      <div key={s.label} className="rounded-2xl border border-ink-foreground/10 p-3 md:p-4">
+                        <div className="text-xl font-bold text-signal md:text-2xl">{s.value}</div>
                         <div className="mt-1 text-xs text-ink-muted">{s.label}</div>
                       </div>
                     ))}
                   </div>
-                  <ul className="space-y-2 text-sm text-ink-foreground/80">
-                    {pr.points.map((pt) => <li key={pt} className="flex gap-2"><span className="text-signal">→</span>{pt}</li>)}
-                  </ul>
+                  <div className={`grid transition-[grid-template-rows] duration-500 lg:grid-rows-[1fr] ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+                    <ul className="space-y-2 overflow-hidden text-sm text-ink-foreground/80">
+                      {pr.points.map((pt) => <li key={pt} className="flex gap-2"><span className="text-signal">→</span>{pt}</li>)}
+                    </ul>
+                  </div>
                   <div className="mt-auto flex flex-wrap gap-2 pt-8">
                     {pr.stack.map((s) => <span key={s} className="rounded-full border border-ink-foreground/15 px-3 py-1 font-mono text-[11px]">{s}</span>)}
                   </div>
@@ -276,46 +286,58 @@ export function Work() {
 }
 
 export function Skills() {
+  const [open, setOpen] = useState<string | null>(null);
   const icons: Record<string, string> = { Languages: icLang, Frameworks: icFw, Databases: icDb, Data: icData, Tools: icTools, Concepts: icBrain };
   const spans: Record<string, string> = {
-    Languages: "md:col-span-2 md:row-span-2",
-    Frameworks: "md:col-span-2",
+    Languages: "col-span-2 row-span-2",
+    Frameworks: "col-span-2",
     Databases: "",
     Data: "",
-    Tools: "md:col-span-2",
-    Concepts: "md:col-span-2",
+    Tools: "col-span-2",
+    Concepts: "col-span-2",
   };
   return (
-    <section className="px-6 py-32">
+    <section className="px-4 py-24 md:px-6 md:py-32">
       <div className="mx-auto max-w-7xl">
         <Reveal className="flex items-end justify-between gap-6">
           <h2 className="text-5xl font-bold tracking-tight md:text-7xl">what I <em className="font-serif font-normal">work with</em></h2>
           <span className="hidden font-hand text-2xl text-muted-foreground md:block">hover a tile ↘</span>
         </Reveal>
-        <div className="mt-14 grid auto-rows-[13rem] grid-cols-1 gap-4 md:grid-cols-4">
+        <p className="mt-3 font-hand text-xl text-muted-foreground md:hidden">tap a tile to wake it up ↓</p>
+        <div className="mt-10 grid auto-rows-[11rem] grid-cols-2 gap-3 md:mt-14 md:auto-rows-[13rem] md:grid-cols-4 md:gap-4">
           {Object.entries(skills).map(([cat, list], i) => {
             const big = cat === "Languages";
+            const on = open === cat;
             return (
               <Reveal key={cat} delay={i * 80} className={spans[cat] ?? ""}>
                 <Tilt max={8} className="h-full rounded-3xl" style={{ height: "100%" }}>
-                  <div data-hover className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-border p-6 shadow-polaroid transition-colors duration-500 ${big ? "bg-ink text-ink-foreground" : "bg-card hover:bg-paper"}`}>
-                    <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" style={{ background: "var(--gradient-glow)" }} />
+                  <div
+                    data-hover
+                    data-on={on}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={on}
+                    onClick={() => setOpen(on ? null : cat)}
+                    onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setOpen(on ? null : cat)}
+                    className={`group relative flex h-full cursor-pointer select-none flex-col justify-between overflow-hidden rounded-3xl border p-4 shadow-polaroid transition-all duration-500 active:scale-[0.98] md:p-6 ${on ? "border-signal" : "border-border"} ${big ? "bg-ink text-ink-foreground" : "bg-card hover:bg-paper data-[on=true]:bg-paper"}`}
+                  >
+                    <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100 group-data-[on=true]:opacity-100" style={{ background: "var(--gradient-glow)" }} />
                     <img
                       src={icons[cat]}
                       alt=""
                       width={512}
                       height={512}
                       loading="lazy"
-                      className={`pointer-events-none absolute transition-all duration-700 ease-out group-hover:-translate-y-3 group-hover:rotate-[-10deg] group-hover:scale-110 ${big ? "-right-6 bottom-6 w-64 md:w-72" : "-right-4 -top-4 w-32"}`}
+                      className={`pointer-events-none absolute transition-all duration-700 ease-out group-hover:-translate-y-3 group-hover:rotate-[-10deg] group-hover:scale-110 group-data-[on=true]:-translate-y-3 group-data-[on=true]:rotate-[-10deg] group-data-[on=true]:scale-110 ${big ? "-right-6 bottom-10 w-40 sm:w-56 md:bottom-6 md:w-72" : "-right-3 -top-3 w-20 md:-right-4 md:-top-4 md:w-32"}`}
                       style={{ transform: "translateZ(60px)", filter: "drop-shadow(0 20px 18px oklch(0.2 0.01 60 / .3))" }}
                     />
                     <div className="relative" style={{ transform: "translateZ(30px)" }}>
                       <span className={`font-mono text-[10px] ${big ? "text-ink-muted" : "text-muted-foreground"}`}>{String(i + 1).padStart(2, "0")} / {list.length} skills</span>
-                      <h3 className={`mt-1 font-bold tracking-tight ${big ? "text-5xl md:text-6xl" : "text-3xl"}`}>{cat.toLowerCase()}<span className="text-signal">.</span></h3>
+                      <h3 className={`mt-1 font-bold tracking-tight ${big ? "text-4xl md:text-6xl" : "text-2xl md:text-3xl"}`}>{cat.toLowerCase()}<span className="text-signal">.</span></h3>
                     </div>
-                    <div className="relative flex max-w-[85%] flex-wrap gap-1.5" style={{ transform: "translateZ(40px)" }}>
+                    <div className="relative flex max-w-[92%] flex-wrap gap-1 md:max-w-[85%] md:gap-1.5" style={{ transform: "translateZ(40px)" }}>
                       {list.map((sk, j) => (
-                        <span key={sk} className={`rounded-full border px-2.5 py-1 text-xs transition-all duration-300 group-hover:-translate-y-0.5 ${big ? "border-ink-foreground/20 bg-ink-foreground/5" : "border-border bg-background/70"}`} style={{ transitionDelay: `${j * 40}ms` }}>
+                        <span key={sk} className={`rounded-full border px-2 py-0.5 text-[11px] transition-all duration-300 group-hover:-translate-y-0.5 group-data-[on=true]:-translate-y-0.5 group-data-[on=true]:border-signal md:px-2.5 md:py-1 md:text-xs ${big ? "border-ink-foreground/20 bg-ink-foreground/5" : "border-border bg-background/70"}`} style={{ transitionDelay: `${j * 40}ms` }}>
                           {sk}
                         </span>
                       ))}
