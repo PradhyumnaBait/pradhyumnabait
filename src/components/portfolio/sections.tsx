@@ -186,7 +186,7 @@ export function Work() {
 
 export function Skills() {
   const cats = Object.keys(skills);
-  const [cat, setCat] = useState(cats[0]);
+  const [cat, setCat] = useState<string>(cats[0] ?? "Languages");
   return (
     <section className="px-6 py-32">
       <div className="mx-auto max-w-7xl">
@@ -200,12 +200,12 @@ export function Skills() {
               onClick={() => setCat(c)}
               className={`rounded-full border px-4 py-1.5 text-sm transition-all ${cat === c ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"}`}
             >
-              {c} <span className="ml-1 font-mono text-[10px] opacity-60">{skills[c].length}</span>
+              {c} <span className="ml-1 font-mono text-[10px] opacity-60">{skills[c]?.length}</span>
             </button>
           ))}
         </div>
         <div key={cat} className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-          {skills[cat].map((s, i) => (
+          {(skills[cat] ?? []).map((s: string, i: number) => (
             <div key={s} className="animate-rise" style={{ animationDelay: `${i * 60}ms` }}>
               <Tilt max={20} className="rounded-2xl">
                 <div data-hover className="flex aspect-[4/5] flex-col justify-between rounded-2xl border border-border bg-card p-4 shadow-polaroid">
@@ -232,7 +232,7 @@ export function Ask() {
 
   const ask = (i: number) => {
     if (typing) return;
-    const { q, a } = qa[i];
+    const { q, a } = qa[i]!;
     setMsgs((m) => [...m, { from: "me", text: q }]);
     setTyping(true);
     setTimeout(() => {
