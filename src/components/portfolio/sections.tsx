@@ -1,10 +1,26 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Github, Linkedin, Mail, Send, ArrowUp } from "lucide-react";
 import p1 from "@/assets/polaroid-1.jpg";
 import p2 from "@/assets/polaroid-2.jpg";
 import p3 from "@/assets/polaroid-3.jpg";
 import { profile, projects, skills, qa, journey } from "./data";
-import { Tilt, Reveal, useScrollProgress } from "./fx";
+import { Tilt, Reveal, useScrollProgress, Magnetic, confetti, FloatIcon } from "./fx";
+import { deskItems } from "./desk-items";
+import icLang from "@/assets/icons/languages.png";
+import icFw from "@/assets/icons/frameworks.png";
+import icDb from "@/assets/icons/databases.png";
+import icData from "@/assets/icons/data.png";
+import icTools from "@/assets/icons/tools.png";
+import icBrain from "@/assets/icons/brain.png";
+import icRocket from "@/assets/icons/rocket.png";
+import icServer from "@/assets/icons/server.png";
+import icTrophy from "@/assets/icons/trophy.png";
+import icGrad from "@/assets/icons/grad.png";
+import pvMoksha from "@/assets/preview-moksha.jpg";
+import pvMeddesk from "@/assets/preview-meddesk.jpg";
+import pvTrinetra from "@/assets/preview-trinetra.jpg";
+
+const DeskScene = lazy(() => import("./DeskScene"));
 
 export function Nav() {
   return (
@@ -16,7 +32,7 @@ export function Nav() {
           <a href="#about" className="hover:italic">about me</a>
           <a href="#ask" className="hover:italic">ask</a>
         </div>
-        <a href={`mailto:${profile.email}`} className="group flex items-center gap-1">
+        <a href={`mailto:${profile.email}`} onClick={(e) => confetti(e.clientX, e.clientY)} className="group flex items-center gap-1">
           say hey <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </a>
       </nav>
@@ -79,42 +95,46 @@ export function Hero() {
   );
 }
 
-/** "but first —" section with an interactive 3D skill cube */
+/** "but first —" section with an interactive 3D desk */
 export function Toolkit() {
-  const faces = ["Python", "FastAPI", "PyTorch", "React", "Docker", "C++"];
-  const [rot, setRot] = useState<{ x: number; y: number } | null>(null);
-  const tf = ["rotateY(0deg)", "rotateY(90deg)", "rotateY(180deg)", "rotateY(-90deg)", "rotateX(90deg)", "rotateX(-90deg)"];
+  const [active, setActive] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const item = deskItems.find((d) => d.id === active);
   return (
-    <section className="flex min-h-screen flex-col items-center justify-center gap-16 px-6 py-24 text-center">
+    <section className="relative flex min-h-screen flex-col items-center justify-center gap-6 overflow-hidden px-6 py-24 text-center">
       <Reveal>
         <h2 className="text-6xl font-bold leading-[0.95] tracking-tight md:text-8xl">
-          but first —<br />meet the toolkit<span className="text-signal">.</span>
+          but first —<br />welcome to my desk<span className="text-signal">.</span>
         </h2>
-        <p className="mt-4 font-hand text-2xl text-muted-foreground">(hover &amp; drag your mouse over the cube)</p>
+        <p className="mt-4 font-hand text-2xl text-muted-foreground">(hover the things on it · drag to look around)</p>
       </Reveal>
-      <div
-        data-hover
-        className="perspective flex h-72 w-72 items-center justify-center"
-        onMouseMove={(e) => {
-          const r = e.currentTarget.getBoundingClientRect();
-          setRot({ x: ((e.clientY - r.top) / r.height - 0.5) * -180, y: ((e.clientX - r.left) / r.width - 0.5) * 360 });
-        }}
-        onMouseLeave={() => setRot(null)}
-      >
-        <div
-          className={`preserve-3d relative h-40 w-40 transition-transform duration-200 ease-out ${rot ? "" : "animate-spin3d"}`}
-          style={rot ? { transform: `rotateX(${rot.x}deg) rotateY(${rot.y}deg)` } : undefined}
-        >
-          {faces.map((f, i) => (
-            <div
-              key={f}
-              className="backface-hidden absolute inset-0 flex items-center justify-center rounded-2xl border border-ink-foreground/10 bg-ink font-mono text-lg text-ink-foreground shadow-float"
-              style={{ transform: `${tf[i]} translateZ(80px)` }}
-            >
-              <span>{f}<span className="text-signal">_</span></span>
-            </div>
-          ))}
+      <div className="relative h-[28rem] w-full max-w-5xl md:h-[34rem]">
+        {mounted && (
+          <Suspense fallback={<div className="flex h-full items-center justify-center font-mono text-xs text-muted-foreground">setting up the desk…</div>}>
+            <DeskScene active={active} onHover={setActive} />
+          </Suspense>
+        )}
+        <div className="pointer-events-none absolute left-1/2 top-2 -translate-x-1/2">
+          <div key={active ?? "none"} className="animate-rise rounded-2xl border border-border bg-card/90 px-5 py-3 shadow-polaroid backdrop-blur">
+            {item ? (
+              <>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{item.label}</div>
+                <div className="text-2xl font-bold">{item.skill}<span className="text-signal">.</span></div>
+                <div className="font-hand text-lg text-muted-foreground">{item.note}</div>
+              </>
+            ) : (
+              <div className="font-hand text-xl text-muted-foreground">psst — point at something ↓</div>
+            )}
+          </div>
         </div>
+      </div>
+      <div className="flex flex-wrap justify-center gap-2">
+        {deskItems.map((d) => (
+          <button key={d.id} onMouseEnter={() => setActive(d.id)} onMouseLeave={() => setActive(null)} onClick={() => setActive(d.id)} className={`rounded-full border px-3 py-1 font-mono text-[11px] transition-all ${active === d.id ? "border-signal bg-signal text-accent-foreground" : "border-border text-muted-foreground"}`}>
+            {d.skill}
+          </button>
+        ))}
       </div>
     </section>
   );
@@ -126,6 +146,8 @@ export function Manifesto() {
   return (
     <section ref={ref} id="about" className="relative h-[220vh] bg-ink text-ink-foreground">
       <div className="sticky top-0 flex h-screen items-center justify-center px-6">
+        <FloatIcon src={icServer} alt="server" className="absolute left-[8%] top-[18%] w-24 opacity-90 md:w-32" />
+        <FloatIcon src={icBrain} alt="brain" className="absolute bottom-[14%] right-[8%] w-24 md:w-32" delay={1.5} />
         <p className="max-w-5xl text-center text-4xl font-semibold leading-tight tracking-tight md:text-7xl">
           {words.map((w, i) => {
             const on = p * words.length * 1.15 > i;
@@ -142,24 +164,43 @@ export function Manifesto() {
 }
 
 export function Work() {
+  const previews: Record<string, string> = { moksha: pvMoksha, meddesk: pvMeddesk, trinetra: pvTrinetra };
+  const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null);
   return (
-    <section id="work" className="bg-ink px-6 pb-32 pt-10 text-ink-foreground">
+    <section id="work" className="relative bg-ink px-6 pb-32 pt-10 text-ink-foreground">
+      <div
+        className="pointer-events-none fixed left-0 top-0 z-30 hidden w-72 overflow-hidden rounded-2xl border border-ink-foreground/20 shadow-float transition-[opacity,scale] duration-300 lg:block"
+        style={{ opacity: hover ? 1 : 0, scale: hover ? "1" : "0.6", transform: `translate(${(hover?.x ?? 0) + 24}px, ${(hover?.y ?? 0) + 24}px) rotate(-4deg)` }}
+      >
+        {Object.entries(previews).map(([id, src]) => (
+          <img key={id} src={src} alt={`${id} preview`} width={976} height={688} loading="lazy" className={`aspect-[976/688] w-full object-cover ${hover?.id === id ? "block" : "hidden"}`} />
+        ))}
+      </div>
       <div className="mx-auto max-w-7xl">
         <Reveal className="mb-16 flex items-end justify-between">
-          <h2 className="text-5xl font-bold tracking-tight md:text-7xl">selected <em className="font-serif font-normal">work</em></h2>
+          <div className="flex items-center gap-4">
+            <h2 className="text-5xl font-bold tracking-tight md:text-7xl">selected <em className="font-serif font-normal">work</em></h2>
+            <FloatIcon src={icRocket} alt="rocket" className="w-20 md:w-28" />
+          </div>
           <span className="font-mono text-xs text-ink-muted">03 projects · more soon</span>
         </Reveal>
         <div className="grid gap-8 lg:grid-cols-3">
           {projects.map((pr, i) => (
             <Reveal key={pr.id} delay={i * 120}>
               <Tilt max={10} className="h-full rounded-3xl">
-                <article data-hover className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-ink-foreground/10 bg-ink-foreground/[0.04] p-7 shadow-float">
+                <article
+                  data-hover
+                  onMouseMove={(e) => setHover({ id: pr.id, x: e.clientX, y: e.clientY })}
+                  onMouseLeave={() => setHover(null)}
+                  className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-ink-foreground/10 bg-ink-foreground/[0.04] p-7 shadow-float"
+                >
                   <div className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" style={{ background: "var(--gradient-glow)" }} />
                   <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-widest text-ink-muted" style={{ transform: "translateZ(20px)" }}>
                     <span>0{i + 1}</span><span>{pr.kind}</span>
                   </div>
                   <h3 className="mt-10 text-4xl font-extrabold tracking-tight" style={{ transform: "translateZ(50px)" }}>{pr.name}</h3>
                   <p className="font-serif text-2xl italic text-ink-muted" style={{ transform: "translateZ(40px)" }}>{pr.tagline}</p>
+                  <img src={previews[pr.id]} alt={`${pr.name} preview`} width={976} height={688} loading="lazy" className="mt-6 aspect-video w-full rounded-xl object-cover lg:hidden" />
                   <div className="my-8 grid grid-cols-2 gap-4" style={{ transform: "translateZ(60px)" }}>
                     {[pr.stat, pr.stat2].map((s) => (
                       <div key={s.label} className="rounded-2xl border border-ink-foreground/10 p-4">
@@ -174,6 +215,11 @@ export function Work() {
                   <div className="mt-auto flex flex-wrap gap-2 pt-8">
                     {pr.stack.map((s) => <span key={s} className="rounded-full border border-ink-foreground/15 px-3 py-1 font-mono text-[11px]">{s}</span>)}
                   </div>
+                  <Magnetic className="mt-6 self-start">
+                    <a href={profile.github} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-full bg-signal px-5 py-2.5 text-sm font-medium text-accent-foreground transition-transform hover:scale-105">
+                      view case study <ArrowUpRight className="h-4 w-4 transition-transform group-hover:rotate-45" />
+                    </a>
+                  </Magnetic>
                 </article>
               </Tilt>
             </Reveal>
@@ -185,37 +231,55 @@ export function Work() {
 }
 
 export function Skills() {
-  const cats = Object.keys(skills);
-  const [cat, setCat] = useState<string>(cats[0] ?? "Languages");
+  const icons: Record<string, string> = { Languages: icLang, Frameworks: icFw, Databases: icDb, Data: icData, Tools: icTools, Concepts: icBrain };
+  const spans: Record<string, string> = {
+    Languages: "md:col-span-2 md:row-span-2",
+    Frameworks: "md:col-span-2",
+    Databases: "",
+    Data: "",
+    Tools: "md:col-span-2",
+    Concepts: "md:col-span-2",
+  };
   return (
     <section className="px-6 py-32">
       <div className="mx-auto max-w-7xl">
-        <Reveal>
+        <Reveal className="flex items-end justify-between gap-6">
           <h2 className="text-5xl font-bold tracking-tight md:text-7xl">what I <em className="font-serif font-normal">work with</em></h2>
+          <span className="hidden font-hand text-2xl text-muted-foreground md:block">hover a tile ↘</span>
         </Reveal>
-        <div className="mt-10 flex flex-wrap gap-2">
-          {cats.map((c) => (
-            <button
-              key={c}
-              onClick={() => setCat(c)}
-              className={`rounded-full border px-4 py-1.5 text-sm transition-all ${cat === c ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"}`}
-            >
-              {c} <span className="ml-1 font-mono text-[10px] opacity-60">{skills[c]?.length}</span>
-            </button>
-          ))}
-        </div>
-        <div key={cat} className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-          {(skills[cat] ?? []).map((s: string, i: number) => (
-            <div key={s} className="animate-rise" style={{ animationDelay: `${i * 60}ms` }}>
-              <Tilt max={20} className="rounded-2xl">
-                <div data-hover className="flex aspect-[4/5] flex-col justify-between rounded-2xl border border-border bg-card p-4 shadow-polaroid">
-                  <span className="font-mono text-[10px] text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="text-xl font-semibold leading-tight" style={{ transform: "translateZ(40px)" }}>{s}</span>
-                  <span className="h-1 w-8 rounded-full bg-signal" />
-                </div>
-              </Tilt>
-            </div>
-          ))}
+        <div className="mt-14 grid auto-rows-[13rem] grid-cols-1 gap-4 md:grid-cols-4">
+          {Object.entries(skills).map(([cat, list], i) => {
+            const big = cat === "Languages";
+            return (
+              <Reveal key={cat} delay={i * 80} className={spans[cat] ?? ""}>
+                <Tilt max={8} className="h-full rounded-3xl" style={{ height: "100%" }}>
+                  <div data-hover className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-border p-6 shadow-polaroid transition-colors duration-500 ${big ? "bg-ink text-ink-foreground" : "bg-card hover:bg-paper"}`}>
+                    <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" style={{ background: "var(--gradient-glow)" }} />
+                    <img
+                      src={icons[cat]}
+                      alt=""
+                      width={512}
+                      height={512}
+                      loading="lazy"
+                      className={`pointer-events-none absolute transition-all duration-700 ease-out group-hover:-translate-y-3 group-hover:rotate-[-10deg] group-hover:scale-110 ${big ? "-right-6 bottom-6 w-64 md:w-72" : "-right-4 -top-4 w-32"}`}
+                      style={{ transform: "translateZ(60px)", filter: "drop-shadow(0 20px 18px oklch(0.2 0.01 60 / .3))" }}
+                    />
+                    <div className="relative" style={{ transform: "translateZ(30px)" }}>
+                      <span className={`font-mono text-[10px] ${big ? "text-ink-muted" : "text-muted-foreground"}`}>{String(i + 1).padStart(2, "0")} / {list.length} skills</span>
+                      <h3 className={`mt-1 font-bold tracking-tight ${big ? "text-5xl md:text-6xl" : "text-3xl"}`}>{cat.toLowerCase()}<span className="text-signal">.</span></h3>
+                    </div>
+                    <div className="relative flex max-w-[85%] flex-wrap gap-1.5" style={{ transform: "translateZ(40px)" }}>
+                      {list.map((sk, j) => (
+                        <span key={sk} className={`rounded-full border px-2.5 py-1 text-xs transition-all duration-300 group-hover:-translate-y-0.5 ${big ? "border-ink-foreground/20 bg-ink-foreground/5" : "border-border bg-background/70"}`} style={{ transitionDelay: `${j * 40}ms` }}>
+                          {sk}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </Tilt>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -263,6 +327,7 @@ export function Ask() {
           <div ref={box} className="flex h-[30rem] flex-col overflow-y-auto px-6 py-10">
             {msgs.length === 0 ? (
               <div className="m-auto text-center">
+                <FloatIcon src={icBrain} alt="thinking brain" className="mx-auto mb-4 w-24" />
                 <h3 className="text-3xl font-medium md:text-4xl">What do you want to know about Pradhyumna?</h3>
                 <p className="mt-2 text-sm text-muted-foreground">This one is on a strict diet of pre-written questions.</p>
               </div>
@@ -302,23 +367,38 @@ export function Ask() {
 }
 
 export function Journey() {
+  const { ref, p } = useScrollProgress<HTMLDivElement>();
+  const icons = [icGrad, icRocket, icTrophy];
   return (
     <section className="px-6 py-24">
       <div className="mx-auto max-w-5xl">
         <Reveal><h2 className="text-5xl font-bold tracking-tight md:text-7xl">the <em className="font-serif font-normal">journey</em> so far</h2></Reveal>
-        <div className="mt-14 divide-y divide-border border-y border-border">
-          {journey.map((j, i) => (
-            <Reveal key={j.title} delay={i * 100}>
-              <div data-hover className="group grid gap-2 py-8 transition-all hover:pl-4 md:grid-cols-[12rem_1fr_auto] md:items-center">
-                <span className="font-mono text-xs text-muted-foreground">{j.year}</span>
-                <div>
-                  <div className="text-2xl font-semibold transition-colors group-hover:text-signal">{j.title}</div>
-                  <div className="text-sm text-muted-foreground">{j.place}</div>
+        <div ref={ref} className="relative mt-16 pb-[8vh]">
+          <div className="absolute left-6 top-0 h-full w-px bg-border md:left-1/2" />
+          <div className="absolute left-6 top-0 w-[3px] -translate-x-px rounded-full bg-signal shadow-[0_0_16px_var(--signal)] md:left-1/2" style={{ height: `${Math.min(100, p * 140)}%` }} />
+          <div className="space-y-24">
+            {journey.map((j, i) => {
+              const lit = p * 140 > (i / journey.length) * 100 + 5;
+              const left = i % 2 === 0;
+              return (
+                <div key={j.title} className={`relative grid items-center gap-6 pl-16 md:grid-cols-2 md:pl-0`}>
+                  <span className={`absolute left-6 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 transition-all duration-500 md:left-1/2 ${lit ? "scale-125 border-signal bg-signal" : "border-border bg-background"}`} />
+                  <div className={`${left ? "md:order-1 md:pr-16 md:text-right" : "md:order-2 md:pl-16"} transition-all duration-700 ${lit ? "opacity-100 translate-y-0" : "opacity-30 translate-y-6"}`}>
+                    <Tilt max={10} className="rounded-3xl">
+                      <div data-hover className="rounded-3xl border border-border bg-card p-6 shadow-polaroid">
+                        <span className="font-mono text-xs text-signal">{j.year}</span>
+                        <div className="mt-2 text-2xl font-semibold">{j.title}</div>
+                        <div className="mt-1 text-sm text-muted-foreground">{j.place}</div>
+                      </div>
+                    </Tilt>
+                  </div>
+                  <div className={`${left ? "md:order-2 md:pl-16" : "md:order-1 md:pr-16 md:flex md:justify-end"} hidden md:block transition-all duration-700 ${lit ? "scale-100 opacity-100" : "scale-50 opacity-0"}`}>
+                    <FloatIcon src={icons[i % icons.length]!} alt="" className="w-32" delay={i * 0.7} />
+                  </div>
                 </div>
-                <ArrowUpRight className="hidden h-6 w-6 opacity-0 transition-all group-hover:rotate-45 group-hover:opacity-100 md:block" />
-              </div>
-            </Reveal>
-          ))}
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
@@ -335,17 +415,17 @@ export function Outro() {
   return (
     <footer className="grain relative overflow-hidden bg-ink pt-24 text-ink-foreground">
       <div className="mx-auto max-w-7xl px-6">
-        <p className="font-hand text-3xl text-signal">that's the tour —</p>
+        <div className="flex items-center gap-4"><FloatIcon src={icTrophy} alt="trophy" className="w-20" /><p className="font-hand text-3xl text-signal">that's the tour —</p></div>
         <h2 className="mt-2 text-[14vw] font-extrabold leading-[0.85] tracking-[-0.06em] lg:text-[11rem]">
           that's all<br /><em className="font-serif font-normal">from me</em><span className="text-signal">.</span>
         </h2>
         <div className="mt-14 flex flex-wrap gap-4">
           {links.map(({ icon: I, label, href }) => (
-            <Tilt key={label} max={20} className="rounded-full">
-              <a href={href} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-full border border-ink-foreground/20 px-6 py-3 transition-colors hover:border-signal hover:bg-signal">
+            <Magnetic key={label}>
+              <a href={href} target="_blank" rel="noreferrer" onClick={(e) => label === "email" && confetti(e.clientX, e.clientY)} className="flex items-center gap-2 rounded-full border border-ink-foreground/20 px-6 py-3 transition-colors hover:border-signal hover:bg-signal">
                 <I className="h-4 w-4" /> {label}
               </a>
-            </Tilt>
+            </Magnetic>
           ))}
           <a href="#top" className="ml-auto flex items-center gap-2 self-center text-sm text-ink-muted hover:text-ink-foreground">back to top <ArrowUp className="h-4 w-4" /></a>
         </div>
