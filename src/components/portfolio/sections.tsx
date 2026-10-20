@@ -164,7 +164,7 @@ export function Toolkit() {
 
       <div className="grid w-full max-w-3xl grid-cols-3 gap-2 sm:grid-cols-6">
         {deskItems.map((d) => {
-          const I = deskIcons[d.id];
+          const I = deskIcons[d.id] ?? Laptop;
           const on = active === d.id;
           return (
             <button

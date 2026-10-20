@@ -27,7 +27,7 @@ function elbow(tx: number, ty: number) {
 function pose(t: number) {
   const i = Math.min(N - 1, Math.floor(t / D));
   const u = Math.min(1, (t - i * D) / D);
-  const [sx, sy] = SLOTS[i];
+  const [sx, sy] = SLOTS[i]!;
   const path = (s: number) => ({ x: lerp(PICK.x, sx, s), y: lerp(PICK.y, sy, s) - GRIP - Math.sin(Math.PI * s) * 110 });
   let e = path(0), carrying = false, grip = 1;
   if (u < 0.12) { e = path(0); e.y -= (1 - u / 0.12) * 14; grip = u / 0.12; carrying = u > 0.1; }
