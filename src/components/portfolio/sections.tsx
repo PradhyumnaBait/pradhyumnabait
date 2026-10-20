@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Github, Linkedin, Mail, Send, ArrowUp } from "lucide-react";
+import { ArrowUpRight, Github, Linkedin, Mail, Send, ArrowUp, Laptop, Cpu, Coffee, Sprout, Server, BookOpen, MousePointerClick, Plus } from "lucide-react";
+import { Cat } from "./Cat";
 import p1 from "@/assets/polaroid-1.jpg";
 import p2 from "@/assets/polaroid-2.jpg";
 import p3 from "@/assets/polaroid-3.jpg";
@@ -65,7 +66,7 @@ export function Hero() {
               style={{ animationDelay: "250ms", transform: `translate(${m.x * -14}px, ${m.y * -8}px)` }}
             >
               pradhyumna<span className="text-signal">.</span>
-              <span className="absolute -top-6 right-10 rotate-[-6deg] font-hand text-2xl font-medium tracking-normal text-signal">ok, you can stay ↓</span>
+              <Cat />
             </span>
           </h1>
         </div>
@@ -96,45 +97,89 @@ export function Hero() {
 }
 
 /** "but first —" section with an interactive 3D desk */
+const deskIcons: Record<string, typeof Laptop> = { laptop: Laptop, gpu: Cpu, mug: Coffee, plant: Sprout, server: Server, books: BookOpen };
 export function Toolkit() {
   const [active, setActive] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+  const select = (id: string) => setActive((a) => (a === id ? null : id));
   const item = deskItems.find((d) => d.id === active);
+  const Icon = item ? deskIcons[item.id] : null;
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center gap-6 overflow-hidden px-6 py-24 text-center">
+    <section className="relative flex min-h-screen flex-col items-center justify-center gap-6 overflow-hidden px-4 py-24 text-center md:px-6">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 opacity-50 blur-3xl" style={{ background: "radial-gradient(ellipse at 50% 80%, oklch(0.75 0.1 60 / .45), transparent 65%)" }} />
       <Reveal>
-        <h2 className="text-6xl font-bold leading-[0.95] tracking-tight md:text-8xl">
+        <h2 className="text-5xl font-bold leading-[0.95] tracking-tight sm:text-6xl md:text-8xl">
           but first —<br />welcome to my desk<span className="text-signal">.</span>
         </h2>
-        <p className="mt-4 font-hand text-2xl text-muted-foreground">(hover the things on it · drag to look around)</p>
+        <p className="mt-4 font-hand text-xl text-muted-foreground md:text-2xl">
+          <span className="hidden md:inline">(hover the things on it · drag to look around)</span>
+          <span className="md:hidden">(tap the glowing dots on the desk)</span>
+        </p>
       </Reveal>
-      <div className="relative h-[28rem] w-full max-w-5xl md:h-[34rem]">
-        {mounted && (
-          <Suspense fallback={<div className="flex h-full items-center justify-center font-mono text-xs text-muted-foreground">setting up the desk…</div>}>
-            <DeskScene active={active} onHover={setActive} />
-          </Suspense>
-        )}
-        <div className="pointer-events-none absolute left-1/2 top-2 -translate-x-1/2">
-          <div key={active ?? "none"} className="animate-rise rounded-2xl border border-border bg-card/90 px-5 py-3 shadow-polaroid backdrop-blur">
-            {item ? (
-              <>
-                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{item.label}</div>
-                <div className="text-2xl font-bold">{item.skill}<span className="text-signal">.</span></div>
-                <div className="font-hand text-lg text-muted-foreground">{item.note}</div>
-              </>
+      <div className="relative w-full max-w-6xl">
+        <div className="relative h-[25rem] w-full sm:h-[28rem] md:h-[36rem]">
+          {mounted && (
+            <Suspense fallback={<div className="flex h-full items-center justify-center font-mono text-xs text-muted-foreground">setting up the desk…</div>}>
+              <DeskScene active={active} onHover={setActive} onSelect={select} />
+            </Suspense>
+          )}
+        </div>
+
+        {/* info card: floating on desktop, below the desk on mobile */}
+        <div className="mx-auto mt-2 w-full max-w-sm md:pointer-events-none md:absolute md:left-4 md:top-4 md:mt-0 md:w-72">
+          <div key={active ?? "none"} className="animate-rise rounded-3xl border border-border bg-card/85 p-4 text-left shadow-polaroid backdrop-blur-md">
+            <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-signal" /> {item ? item.label : "on the desk"}
+              <span className="h-px flex-1 bg-border" />
+            </div>
+            {item && Icon ? (
+              <div className="mt-3 flex items-center gap-3">
+                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-signal text-accent-foreground shadow-polaroid"><Icon className="h-6 w-6" /></div>
+                <div className="min-w-0">
+                  <div className="truncate text-xl font-bold">{item.skill}<span className="text-signal">.</span></div>
+                  <div className="font-hand text-lg leading-tight text-muted-foreground">{item.note}</div>
+                </div>
+              </div>
             ) : (
-              <div className="font-hand text-xl text-muted-foreground">psst — point at something ↓</div>
+              <div className="mt-2 font-hand text-xl text-muted-foreground">six things, six skills. pick one ↓</div>
             )}
           </div>
         </div>
+
+        <div className="pointer-events-none absolute right-6 top-6 hidden rotate-[-8deg] text-left font-hand text-2xl leading-tight text-muted-foreground md:block">
+          build<br />&nbsp;&nbsp;create<br />&nbsp;&nbsp;&nbsp;&nbsp;solve →
+        </div>
+
+        {!active && (
+          <div className="pointer-events-none absolute bottom-4 left-1/2 hidden -translate-x-1/2 items-center gap-3 md:flex">
+            <span className="h-px w-10 bg-signal/50" />
+            <span className="rounded-full border border-signal/40 bg-card/80 px-5 py-2 font-mono text-[11px] uppercase tracking-[0.25em] text-signal shadow-polaroid backdrop-blur">
+              <MousePointerClick className="mr-2 inline h-3.5 w-3.5" />hover to explore
+            </span>
+            <span className="h-px w-10 bg-signal/50" />
+          </div>
+        )}
       </div>
-      <div className="flex flex-wrap justify-center gap-2">
-        {deskItems.map((d) => (
-          <button key={d.id} onMouseEnter={() => setActive(d.id)} onMouseLeave={() => setActive(null)} onClick={() => setActive(d.id)} className={`rounded-full border px-3 py-1 font-mono text-[11px] transition-all ${active === d.id ? "border-signal bg-signal text-accent-foreground" : "border-border text-muted-foreground"}`}>
-            {d.skill}
-          </button>
-        ))}
+
+      <div className="grid w-full max-w-3xl grid-cols-3 gap-2 sm:grid-cols-6">
+        {deskItems.map((d) => {
+          const I = deskIcons[d.id] ?? Laptop;
+          const on = active === d.id;
+          return (
+            <button
+              key={d.id}
+              type="button"
+              onMouseEnter={(e) => { if (window.matchMedia("(hover: hover)").matches) setActive(d.id); void e; }}
+              onClick={() => (window.matchMedia("(hover: hover)").matches ? setActive(d.id) : select(d.id))}
+              aria-pressed={on}
+              className={`flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-2xl border p-2 transition-all duration-300 active:scale-95 ${on ? "-translate-y-1 border-signal bg-card shadow-polaroid" : "border-border bg-card/50"}`}
+            >
+              <span className={`grid h-9 w-9 place-items-center rounded-xl transition-colors ${on ? "bg-signal text-accent-foreground" : "bg-muted text-foreground"}`}><I className="h-4 w-4" /></span>
+              <span className="font-mono text-[10px] leading-tight text-muted-foreground">{d.skill}</span>
+            </button>
+          );
+        })}
       </div>
     </section>
   );
@@ -166,8 +211,9 @@ export function Manifesto() {
 export function Work() {
   const previews: Record<string, string> = { moksha: pvMoksha, meddesk: pvMeddesk, trinetra: pvTrinetra };
   const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
   return (
-    <section id="work" className="relative bg-ink px-6 pb-32 pt-10 text-ink-foreground">
+    <section id="work" className="relative bg-ink px-4 pb-24 pt-10 text-ink-foreground md:px-6 md:pb-32">
       <div
         className="pointer-events-none fixed left-0 top-0 z-30 hidden w-72 overflow-hidden rounded-2xl border border-ink-foreground/20 shadow-float transition-[opacity,scale] duration-300 lg:block"
         style={{ opacity: hover ? 1 : 0, scale: hover ? "1" : "0.6", transform: `translate(${(hover?.x ?? 0) + 24}px, ${(hover?.y ?? 0) + 24}px) rotate(-4deg)` }}
@@ -184,34 +230,44 @@ export function Work() {
           </div>
           <span className="font-mono text-xs text-ink-muted">03 projects · more soon</span>
         </Reveal>
-        <div className="grid gap-8 lg:grid-cols-3">
-          {projects.map((pr, i) => (
+        <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
+          {projects.map((pr, i) => {
+            const open = openId === pr.id;
+            return (
             <Reveal key={pr.id} delay={i * 120}>
               <Tilt max={10} className="h-full rounded-3xl">
                 <article
                   data-hover
+                  data-on={open}
                   onMouseMove={(e) => setHover({ id: pr.id, x: e.clientX, y: e.clientY })}
                   onMouseLeave={() => setHover(null)}
-                  className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-ink-foreground/10 bg-ink-foreground/[0.04] p-7 shadow-float"
+                  className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border bg-ink-foreground/[0.04] p-5 shadow-float transition-colors md:p-7 ${open ? "border-signal/60" : "border-ink-foreground/10"}`}
                 >
-                  <div className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" style={{ background: "var(--gradient-glow)" }} />
+                  <div className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100 group-data-[on=true]:opacity-100" style={{ background: "var(--gradient-glow)" }} />
                   <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-widest text-ink-muted" style={{ transform: "translateZ(20px)" }}>
                     <span>0{i + 1}</span><span>{pr.kind}</span>
                   </div>
-                  <h3 className="mt-10 text-4xl font-extrabold tracking-tight" style={{ transform: "translateZ(50px)" }}>{pr.name}</h3>
-                  <p className="font-serif text-2xl italic text-ink-muted" style={{ transform: "translateZ(40px)" }}>{pr.tagline}</p>
-                  <img src={previews[pr.id]} alt={`${pr.name} preview`} width={976} height={688} loading="lazy" className="mt-6 aspect-video w-full rounded-xl object-cover lg:hidden" />
-                  <div className="my-8 grid grid-cols-2 gap-4" style={{ transform: "translateZ(60px)" }}>
+                  <button type="button" onClick={() => setOpenId(open ? null : pr.id)} className="relative mt-5 overflow-hidden rounded-2xl lg:hidden" aria-label={`${pr.name} details`}>
+                    <img src={previews[pr.id]} alt={`${pr.name} preview`} width={976} height={688} loading="lazy" className={`aspect-video w-full object-cover transition-transform duration-700 ${open ? "scale-105" : ""}`} />
+                    <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-ink/80 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-ink-foreground backdrop-blur">
+                      <Plus className={`h-3 w-3 transition-transform ${open ? "rotate-45" : ""}`} /> {open ? "less" : "tap for details"}
+                    </span>
+                  </button>
+                  <h3 className="mt-6 text-3xl font-extrabold tracking-tight md:text-4xl lg:mt-10" style={{ transform: "translateZ(50px)" }}>{pr.name}</h3>
+                  <p className="font-serif text-xl italic text-ink-muted md:text-2xl" style={{ transform: "translateZ(40px)" }}>{pr.tagline}</p>
+                  <div className="my-6 grid grid-cols-2 gap-3 md:my-8 md:gap-4" style={{ transform: "translateZ(60px)" }}>
                     {[pr.stat, pr.stat2].map((s) => (
-                      <div key={s.label} className="rounded-2xl border border-ink-foreground/10 p-4">
-                        <div className="text-2xl font-bold text-signal">{s.value}</div>
+                      <div key={s.label} className="rounded-2xl border border-ink-foreground/10 p-3 md:p-4">
+                        <div className="text-xl font-bold text-signal md:text-2xl">{s.value}</div>
                         <div className="mt-1 text-xs text-ink-muted">{s.label}</div>
                       </div>
                     ))}
                   </div>
-                  <ul className="space-y-2 text-sm text-ink-foreground/80">
-                    {pr.points.map((pt) => <li key={pt} className="flex gap-2"><span className="text-signal">→</span>{pt}</li>)}
-                  </ul>
+                  <div className={`grid transition-[grid-template-rows] duration-500 lg:grid-rows-[1fr] ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+                    <ul className="space-y-2 overflow-hidden text-sm text-ink-foreground/80">
+                      {pr.points.map((pt) => <li key={pt} className="flex gap-2"><span className="text-signal">→</span>{pt}</li>)}
+                    </ul>
+                  </div>
                   <div className="mt-auto flex flex-wrap gap-2 pt-8">
                     {pr.stack.map((s) => <span key={s} className="rounded-full border border-ink-foreground/15 px-3 py-1 font-mono text-[11px]">{s}</span>)}
                   </div>
@@ -223,7 +279,8 @@ export function Work() {
                 </article>
               </Tilt>
             </Reveal>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
@@ -231,46 +288,58 @@ export function Work() {
 }
 
 export function Skills() {
+  const [open, setOpen] = useState<string | null>(null);
   const icons: Record<string, string> = { Languages: icLang, Frameworks: icFw, Databases: icDb, Data: icData, Tools: icTools, Concepts: icBrain };
   const spans: Record<string, string> = {
-    Languages: "md:col-span-2 md:row-span-2",
-    Frameworks: "md:col-span-2",
+    Languages: "col-span-2 row-span-2",
+    Frameworks: "col-span-2",
     Databases: "",
     Data: "",
-    Tools: "md:col-span-2",
-    Concepts: "md:col-span-2",
+    Tools: "col-span-2",
+    Concepts: "col-span-2",
   };
   return (
-    <section className="px-6 py-32">
+    <section className="px-4 py-24 md:px-6 md:py-32">
       <div className="mx-auto max-w-7xl">
         <Reveal className="flex items-end justify-between gap-6">
           <h2 className="text-5xl font-bold tracking-tight md:text-7xl">what I <em className="font-serif font-normal">work with</em></h2>
           <span className="hidden font-hand text-2xl text-muted-foreground md:block">hover a tile ↘</span>
         </Reveal>
-        <div className="mt-14 grid auto-rows-[13rem] grid-cols-1 gap-4 md:grid-cols-4">
+        <p className="mt-3 font-hand text-xl text-muted-foreground md:hidden">tap a tile to wake it up ↓</p>
+        <div className="mt-10 grid auto-rows-[11rem] grid-cols-2 gap-3 md:mt-14 md:auto-rows-[13rem] md:grid-cols-4 md:gap-4">
           {Object.entries(skills).map(([cat, list], i) => {
             const big = cat === "Languages";
+            const on = open === cat;
             return (
               <Reveal key={cat} delay={i * 80} className={spans[cat] ?? ""}>
                 <Tilt max={8} className="h-full rounded-3xl" style={{ height: "100%" }}>
-                  <div data-hover className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-border p-6 shadow-polaroid transition-colors duration-500 ${big ? "bg-ink text-ink-foreground" : "bg-card hover:bg-paper"}`}>
-                    <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" style={{ background: "var(--gradient-glow)" }} />
+                  <div
+                    data-hover
+                    data-on={on}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={on}
+                    onClick={() => setOpen(on ? null : cat)}
+                    onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setOpen(on ? null : cat)}
+                    className={`group relative flex h-full cursor-pointer select-none flex-col justify-between overflow-hidden rounded-3xl border p-4 shadow-polaroid transition-all duration-500 active:scale-[0.98] md:p-6 ${on ? "border-signal" : "border-border"} ${big ? "bg-ink text-ink-foreground" : "bg-card hover:bg-paper data-[on=true]:bg-paper"}`}
+                  >
+                    <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100 group-data-[on=true]:opacity-100" style={{ background: "var(--gradient-glow)" }} />
                     <img
                       src={icons[cat]}
                       alt=""
                       width={512}
                       height={512}
                       loading="lazy"
-                      className={`pointer-events-none absolute transition-all duration-700 ease-out group-hover:-translate-y-3 group-hover:rotate-[-10deg] group-hover:scale-110 ${big ? "-right-6 bottom-6 w-64 md:w-72" : "-right-4 -top-4 w-32"}`}
+                      className={`pointer-events-none absolute transition-all duration-700 ease-out group-hover:-translate-y-3 group-hover:rotate-[-10deg] group-hover:scale-110 group-data-[on=true]:-translate-y-3 group-data-[on=true]:rotate-[-10deg] group-data-[on=true]:scale-110 ${big ? "-right-6 bottom-10 w-40 sm:w-56 md:bottom-6 md:w-72" : "-right-3 -top-3 w-20 md:-right-4 md:-top-4 md:w-32"}`}
                       style={{ transform: "translateZ(60px)", filter: "drop-shadow(0 20px 18px oklch(0.2 0.01 60 / .3))" }}
                     />
                     <div className="relative" style={{ transform: "translateZ(30px)" }}>
                       <span className={`font-mono text-[10px] ${big ? "text-ink-muted" : "text-muted-foreground"}`}>{String(i + 1).padStart(2, "0")} / {list.length} skills</span>
-                      <h3 className={`mt-1 font-bold tracking-tight ${big ? "text-5xl md:text-6xl" : "text-3xl"}`}>{cat.toLowerCase()}<span className="text-signal">.</span></h3>
+                      <h3 className={`mt-1 font-bold tracking-tight ${big ? "text-4xl md:text-6xl" : "text-2xl md:text-3xl"}`}>{cat.toLowerCase()}<span className="text-signal">.</span></h3>
                     </div>
-                    <div className="relative flex max-w-[85%] flex-wrap gap-1.5" style={{ transform: "translateZ(40px)" }}>
+                    <div className="relative flex max-w-[92%] flex-wrap gap-1 md:max-w-[85%] md:gap-1.5" style={{ transform: "translateZ(40px)" }}>
                       {list.map((sk, j) => (
-                        <span key={sk} className={`rounded-full border px-2.5 py-1 text-xs transition-all duration-300 group-hover:-translate-y-0.5 ${big ? "border-ink-foreground/20 bg-ink-foreground/5" : "border-border bg-background/70"}`} style={{ transitionDelay: `${j * 40}ms` }}>
+                        <span key={sk} className={`rounded-full border px-2 py-0.5 text-[11px] transition-all duration-300 group-hover:-translate-y-0.5 group-data-[on=true]:-translate-y-0.5 group-data-[on=true]:border-signal md:px-2.5 md:py-1 md:text-xs ${big ? "border-ink-foreground/20 bg-ink-foreground/5" : "border-border bg-background/70"}`} style={{ transitionDelay: `${j * 40}ms` }}>
                           {sk}
                         </span>
                       ))}

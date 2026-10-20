@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Nav, Hero, Toolkit, Manifesto, Work, Skills, Ask, Journey, Outro } from "@/components/portfolio/sections";
 import { Cursor, ScrollMeter, SoundToggle, StatusWidget } from "@/components/portfolio/fx";
+import { Loader } from "@/components/portfolio/Loader";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <main className="md:cursor-none">
+      <Loader />
       <Cursor />
       <ScrollMeter />
       <Nav />
