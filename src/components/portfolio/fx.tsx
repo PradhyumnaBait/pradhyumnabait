@@ -216,6 +216,7 @@ export function confetti(x: number, y: number) {
 /* ---------- floating 3D icon ---------- */
 export function FloatIcon({ src, alt, className = "", delay = 0 }: { src: string; alt: string; className?: string; delay?: number }) {
   return (
+    <span className={`inline-block transition-transform duration-500 hover:rotate-12 hover:scale-110 ${className}`}>
     <img
       src={src}
       alt={alt}
@@ -223,10 +224,11 @@ export function FloatIcon({ src, alt, className = "", delay = 0 }: { src: string
       height={512}
       loading="lazy"
       data-hover
-      className={`animate-bob select-none drop-shadow-[0_18px_20px_oklch(0.2_0.01_60/0.25)] transition-transform duration-500 hover:rotate-12 hover:scale-110 ${className}`}
+      className="animate-bob w-full select-none drop-shadow-[0_18px_20px_oklch(0.2_0.01_60/0.25)]"
       style={{ animationDelay: `${delay}s` }}
       draggable={false}
     />
+    </span>
   );
 }
 

@@ -140,46 +140,6 @@ export function Toolkit() {
   );
 }
 
-export function Toolkit() {
-  const faces = ["Python", "FastAPI", "PyTorch", "React", "Docker", "C++"];
-  const [rot, setRot] = useState<{ x: number; y: number } | null>(null);
-  const tf = ["rotateY(0deg)", "rotateY(90deg)", "rotateY(180deg)", "rotateY(-90deg)", "rotateX(90deg)", "rotateX(-90deg)"];
-  return (
-    <section className="flex min-h-screen flex-col items-center justify-center gap-16 px-6 py-24 text-center">
-      <Reveal>
-        <h2 className="text-6xl font-bold leading-[0.95] tracking-tight md:text-8xl">
-          but first —<br />meet the toolkit<span className="text-signal">.</span>
-        </h2>
-        <p className="mt-4 font-hand text-2xl text-muted-foreground">(hover &amp; drag your mouse over the cube)</p>
-      </Reveal>
-      <div
-        data-hover
-        className="perspective flex h-72 w-72 items-center justify-center"
-        onMouseMove={(e) => {
-          const r = e.currentTarget.getBoundingClientRect();
-          setRot({ x: ((e.clientY - r.top) / r.height - 0.5) * -180, y: ((e.clientX - r.left) / r.width - 0.5) * 360 });
-        }}
-        onMouseLeave={() => setRot(null)}
-      >
-        <div
-          className={`preserve-3d relative h-40 w-40 transition-transform duration-200 ease-out ${rot ? "" : "animate-spin3d"}`}
-          style={rot ? { transform: `rotateX(${rot.x}deg) rotateY(${rot.y}deg)` } : undefined}
-        >
-          {faces.map((f, i) => (
-            <div
-              key={f}
-              className="backface-hidden absolute inset-0 flex items-center justify-center rounded-2xl border border-ink-foreground/10 bg-ink font-mono text-lg text-ink-foreground shadow-float"
-              style={{ transform: `${tf[i]} translateZ(80px)` }}
-            >
-              <span>{f}<span className="text-signal">_</span></span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export function Manifesto() {
   const { ref, p } = useScrollProgress<HTMLDivElement>();
   const words = "the work between the lines of code — where models meet infrastructure and ideas become systems that ship.".split(" ");
