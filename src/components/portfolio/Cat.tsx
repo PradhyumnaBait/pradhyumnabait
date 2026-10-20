@@ -8,7 +8,7 @@ export function Cat() {
   const [spot, setSpot] = useState(1);
   const [walking, setWalking] = useState(false);
   const [face, setFace] = useState(1);
-  const [line, setLine] = useState<string | null>(LINES[0]);
+  const [line, setLine] = useState<string | null>(LINES[0] ?? null);
   const [boop, setBoop] = useState(0);
   const [eye, setEye] = useState({ x: 0, y: 0 });
   const ref = useRef<HTMLDivElement>(null);
@@ -20,11 +20,11 @@ export function Cat() {
       setLine(null);
       setSpot((s) => {
         const next = (s + 1 + Math.floor(Math.random() * (SPOTS.length - 1))) % SPOTS.length;
-        setFace(SPOTS[next] > SPOTS[s] ? 1 : -1);
+        setFace(SPOTS[next]! > SPOTS[s]! ? 1 : -1);
         return next;
       });
       setWalking(true);
-      setTimeout(() => { setWalking(false); setLine(LINES[n % LINES.length]); }, 1700);
+      setTimeout(() => { setWalking(false); setLine(LINES[n % LINES.length] ?? null); }, 1700);
       setTimeout(() => setLine(null), 4800);
     }, 7000);
     const hide = setTimeout(() => setLine(null), 3500);
