@@ -53,7 +53,7 @@ export function Cat() {
     <div
       ref={ref}
       className="absolute z-10 w-14 transition-[left] ease-in-out md:w-20"
-      style={{ left: `${SPOTS[spot]}%`, top: "calc(0.31em - 3.1rem)", transitionDuration: "1.7s", fontSize: "1rem" }}
+      style={{ left: `${SPOTS[spot]}%`, top: "calc(0.31em - 3.1rem)", transitionDuration: "1.7s" }}
     >
       {line && (
         <div key={line + boop} className="animate-rise absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap rounded-full border border-border bg-card px-3 py-1 font-hand text-lg leading-none tracking-normal text-signal shadow-polaroid md:text-xl">
