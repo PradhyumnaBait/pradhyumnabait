@@ -10,4 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep journey motion calculations in a browser-safe helper and animate SVG path distance and camera together; this prevents arrow jumps and permits focused behavioral tests.
-- The journey uses opt-in desktop scroll storytelling and compact touch navigation below the map; this avoids trapping phone visitors in a long pinned section.
+- The journey uses an opt-in immersive desktop scroll map and a viewport-height touch map with integrated story and navigation; this keeps phone controls visible without a long pinned section.

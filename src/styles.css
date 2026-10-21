@@ -160,6 +160,28 @@
 @media (prefers-reduced-motion: reduce) { .drone-prop, .radio-ring, .cloud-drift { animation: none; } }
 
 .journey-scroll { height: 640vh; }
+.journey-intro { height: min(900px, 100dvh); min-height: 600px; }
+.journey-intro-map { height: 65%; }
+.journey-map-vignette { background: radial-gradient(ellipse at center, transparent 40%, var(--background) 100%); }
+.journey-desktop-story { max-height: calc(100dvh - 210px); overflow-y: auto; }
+.journey-touch-offset { padding-top: 64px; }
+.journey-touch-shell { position: relative; height: calc(100dvh - 64px); min-height: 420px; overflow: hidden; background: var(--map-land); }
+.journey-touch-map { position: absolute; inset: 36px 0 auto; height: 48%; }
+.journey-touch-zoom { position: absolute; top: 8px; right: 8px; display: flex; border: 1px solid var(--border); border-radius: 6px; background: var(--card); }
+.journey-touch-zoom button { width: 32px; height: 32px; }
+.journey-touch-panel { position: absolute; inset: auto 8px 8px; height: 47%; display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 8px; background: var(--card); box-shadow: var(--shadow-polaroid); }
+.journey-touch-story { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 12px; }
+.journey-touch-story .journey-story { padding: 12px 0; }
+.journey-touch-story h3 { margin-top: 12px; font-size: 20px; }
+.journey-touch-story p { margin-top: 8px; }
+.journey-touch-story .journey-story > div:first-child p { margin-top: 0; }
+.journey-touch-nav { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 2px; padding: 4px; border-top: 1px solid var(--border); }
+@media (max-width: 1023px) {
+  .journey-intro { min-height: 560px; }
+  .journey-intro-map { height: 58%; }
+  body:has(#journey[data-started="true"]) button[aria-label="Toggle sound"] { display: none; }
+  body:has(#journey[data-started="true"]) .fixed.bottom-5.left-5 { display: none; }
+}
 .journey-preview { mask-image: radial-gradient(ellipse at center, var(--ink) 48%, transparent 73%); }
 .journey-story { animation: journey-story-in .35s ease-out; }
 @keyframes journey-story-in { from { opacity: .4; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
