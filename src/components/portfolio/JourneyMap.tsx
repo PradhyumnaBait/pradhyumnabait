@@ -33,7 +33,7 @@ function CityMap() {
       <pattern id="journey-windows" width="8" height="8" patternUnits="userSpaceOnUse"><rect x="2" y="2" width="2" height="2" fill="var(--map-roof)" /></pattern>
     </defs>
     <rect width={VW} height={VH} fill="var(--map-land)" />
-    {blocks.map((b, i) => <g key={i}><rect {...b} y={b.y + 2} rx="1" fill="var(--map-block-edge)" /><rect {...b} rx="1" fill={i % 4 === 0 ? "var(--map-block-alt)" : "var(--map-block)"} /><rect {...b} fill="url(#journey-windows)" opacity=".32" /></g>)}
+    {blocks.map((b, i) => <g key={i}><rect x={b.x} y={b.y + 2} width={b.w} height={b.h} rx="1" fill="var(--map-block-edge)" /><rect x={b.x} y={b.y} width={b.w} height={b.h} rx="1" fill={i % 4 === 0 ? "var(--map-block-alt)" : "var(--map-block)"} /><rect x={b.x} y={b.y} width={b.w} height={b.h} fill="url(#journey-windows)" opacity=".32" /></g>)}
     <rect width={VW} height={VH} fill="url(#journey-grid)" />
     <path d="M765 0 C700 70 855 130 730 225 S850 360 790 450 S900 620 835 780" fill="none" stroke="var(--map-water-edge)" strokeWidth="39" />
     <path d="M765 0 C700 70 855 130 730 225 S850 360 790 450 S900 620 835 780" fill="none" stroke="var(--map-water)" strokeWidth="31" />
@@ -149,7 +149,7 @@ export function JourneyMap() {
       <p className="mt-4 text-sm text-muted-foreground">{N} chapters of curiosity, code, and building in the real world.</p>
       <div className="journey-preview mx-auto mt-7 aspect-[1000/780] w-full max-w-[560px] overflow-hidden">{map}</div>
       <Button onClick={start} size="lg" className="relative mt-3 h-12 shadow-polaroid"><MapIcon />View my journey map</Button>
-    </div> : <div className={compact ? "mx-auto max-w-3xl px-4 py-6" : "sticky top-0 flex h-dvh flex-col px-10 pb-16 pt-24"}>
+    </div> : <div className={compact ? "mx-auto max-w-3xl px-4 pb-16 pt-20" : "sticky top-0 flex h-dvh flex-col px-10 pb-16 pt-24"}>
       <div className="flex items-center justify-between gap-3 border-b border-border pb-3"><p className="font-mono text-xs text-muted-foreground">THE JOURNEY · {end ? "Full circle" : `${String(active + 1).padStart(2, "0")} / ${String(N).padStart(2, "0")}`}</p><Button variant="ghost" size="icon" onClick={close} aria-label="Close journey" title="Close journey"><X /></Button></div>
       <div className={compact ? "" : "grid min-h-0 flex-1 grid-cols-[minmax(260px,360px)_minmax(0,1fr)] items-center gap-8"}>
         <div className={compact ? "relative mt-4 aspect-[1000/780] overflow-hidden rounded-lg border border-border" : "relative order-2 h-full min-h-0 overflow-hidden"}>{map}
