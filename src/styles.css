@@ -130,3 +130,28 @@
 .cat-walk { animation: cat-walk .35s ease-in-out infinite; }
 .cat-boop { animation: cat-boop .5s ease-out; transform-origin: 40px 40px; }
 @utility animate-ping-soft { animation: ping-soft 1.8s cubic-bezier(0,0,.2,1) infinite; }
+
+/* drone, journey map, notes, socials */
+:root {
+  --drone-body: oklch(0.96 0.005 250); --drone-shade: oklch(0.82 0.02 250); --drone-skid: oklch(0.7 0.02 250);
+  --drone-dome: oklch(0.3 0.01 250); --drone-motor: oklch(0.82 0.15 80); --drone-lens: oklch(0.6 0.18 255); --btn-green: oklch(0.75 0.17 155);
+  --map-land: oklch(0.96 0.012 90); --map-block: oklch(0.92 0.012 85); --map-road: oklch(0.99 0.003 85); --map-highway: oklch(0.9 0.08 90);
+  --map-water: oklch(0.85 0.06 230); --map-park: oklch(0.88 0.07 145); --map-route: oklch(0.6 0.19 255);
+  --pin-1: oklch(0.72 0.15 160); --pin-2: oklch(0.65 0.16 255); --pin-3: oklch(0.65 0.2 0); --pin-4: oklch(0.6 0.2 30); --pin-5: oklch(0.45 0.18 300); --pin-6: oklch(0.78 0.15 75);
+  --note-yellow: oklch(0.93 0.1 95); --note-pink: oklch(0.88 0.07 15); --note-mint: oklch(0.9 0.07 160); --note-lilac: oklch(0.87 0.07 300); --note-blue: oklch(0.88 0.06 240); --note-peach: oklch(0.89 0.07 60);
+  --key-red: oklch(0.6 0.21 27); --key-blue: oklch(0.55 0.17 255); --key-pink: oklch(0.6 0.22 350); --key-yellow: oklch(0.86 0.17 95);
+}
+@keyframes prop-spin { to { transform: rotate(360deg) scaleY(0.25); } }
+.drone-prop { animation: prop-spin .12s linear infinite; transform-box: fill-box; transform-origin: center; filter: blur(.4px); }
+@keyframes radio { 0% { transform: scale(.3); opacity: .9; } 100% { transform: scale(1.4); opacity: 0; } }
+.radio-ring { animation: radio 1.8s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes note-fly { from { transform: translate(40vw, -30vh) rotate(25deg) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.note-fly { animation: note-fly .9s cubic-bezier(.2,1.2,.4,1) both; }
+@keyframes glint { to { transform: translateX(100%); } }
+.keycap-glint { animation: glint .7s ease-out; }
+@keyframes draw { from { stroke-dasharray: 60; stroke-dashoffset: 60; } to { stroke-dasharray: 60; stroke-dashoffset: 0; } }
+.draw-in { animation: draw .5s ease-out both; }
+@keyframes hl { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.highlighter { background: var(--key-yellow); transform-origin: left; animation: hl 1s .4s cubic-bezier(.2,.7,.2,1) both; transform: skew(-6deg); }
+.cloud-drift { background: radial-gradient(closest-side, oklch(1 0 0 / .7), transparent) 0 0 / 30% 100% repeat-x; animation: marquee 60s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .drone-prop, .radio-ring, .cloud-drift { animation: none; } }
