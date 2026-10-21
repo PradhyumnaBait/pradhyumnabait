@@ -180,6 +180,7 @@
   .journey-intro { min-height: 560px; }
   .journey-intro-map { height: 58%; }
   body:has(#journey[data-started="true"]) button[aria-label="Toggle sound"] { display: none; }
+  body:has(#journey[data-started="true"]) .fixed.bottom-5.left-5 { display: none; }
 }
 .journey-preview { mask-image: radial-gradient(ellipse at center, var(--ink) 48%, transparent 73%); }
 .journey-story { animation: journey-story-in .35s ease-out; }
