@@ -176,7 +176,11 @@
 .journey-touch-story p { margin-top: 8px; }
 .journey-touch-story .journey-story > div:first-child p { margin-top: 0; }
 .journey-touch-nav { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 2px; padding: 4px; border-top: 1px solid var(--border); }
-@media (max-width: 1023px) { .journey-intro { min-height: 560px; } .journey-intro-map { height: 58%; } }
+@media (max-width: 1023px) {
+  .journey-intro { min-height: 560px; }
+  .journey-intro-map { height: 58%; }
+  body:has(#journey[data-started="true"]) button[aria-label="Toggle sound"] { display: none; }
+}
 .journey-preview { mask-image: radial-gradient(ellipse at center, var(--ink) 48%, transparent 73%); }
 .journey-story { animation: journey-story-in .35s ease-out; }
 @keyframes journey-story-in { from { opacity: .4; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
