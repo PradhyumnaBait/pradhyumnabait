@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      note_rate: {
+        Row: {
+          ip_hash: string
+          last_at: string
+        }
+        Insert: {
+          ip_hash: string
+          last_at?: string
+        }
+        Update: {
+          ip_hash?: string
+          last_at?: string
+        }
+        Relationships: []
+      }
+      notes: {
+        Row: {
+          avatar_url: string | null
+          body: string
+          color: string
+          company: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          role: string | null
+          rotation: number
+        }
+        Insert: {
+          avatar_url?: string | null
+          body: string
+          color?: string
+          company?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          role?: string | null
+          rotation?: number
+        }
+        Update: {
+          avatar_url?: string | null
+          body?: string
+          color?: string
+          company?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          role?: string | null
+          rotation?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
