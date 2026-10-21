@@ -7,7 +7,7 @@ export const listNotes = createServerFn({ method: "GET" }).handler(async (): Pro
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
   const sb = createClient(process.env["SUPABASE_URL"]!, key, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
-    global: key.startsWith("sb_") ? { fetch: (u, init) => { const h = new Headers(init?.headers); h.delete("Authorization"); h.set("apikey", key); return fetch(u, { ...init, headers: h }); } } : undefined,
+    global: { fetch: (u: RequestInfo | URL, init?: RequestInit) => { const h = new Headers(init?.headers); if (key.startsWith("sb_")) { h.delete("Authorization"); h.set("apikey", key); } return fetch(u, { ...init, headers: h }); } },
   });
   const { data, error } = await sb.from("notes").select(PUBLIC_COLUMNS).order("created_at", { ascending: false }).limit(200);
   if (error) throw new Error(error.message);
