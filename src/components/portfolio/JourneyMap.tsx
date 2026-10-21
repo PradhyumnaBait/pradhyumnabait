@@ -131,7 +131,7 @@ export function JourneyMap() {
   const close = () => { setStarted(false); setProgress(0); setUserZoom(1); requestAnimationFrame(() => wrap.current?.scrollIntoView({ behavior: "instant", block: "start" })); };
   const map = <svg ref={svg} viewBox={`0 0 ${VW} ${VH}`} preserveAspectRatio="xMidYMid meet" className="h-full w-full" role="img" aria-label="Illustrated heart-shaped journey through Mumbai">
     <CityMap />
-    <path ref={path} d={HEART} fill="none" stroke="var(--map-route)" strokeOpacity=".28" strokeWidth="3" strokeDasharray="3 7" />
+    <path ref={path} d={HEART} fill="none" stroke="var(--map-route)" strokeOpacity={started ? .28 : .65} strokeWidth="3" strokeDasharray={started ? "3 7" : undefined} />
     <path ref={drawn} d={HEART} fill="none" stroke="var(--map-route)" strokeWidth="3.5" strokeLinecap="round" strokeDasharray={`0 ${length}`} />
     {length > 0 && stops.map((st, i) => { const p = point(routeFraction(i, N)); const on = started && !end && i === active; return <g key={st.id} transform={`translate(${p.x} ${p.y})`}>
       <path d="M0 0C-14 -16 -14 -37 0 -37C14 -37 14 -16 0 0Z" fill={st.color} stroke="var(--paper)" strokeWidth={on ? 4 : 2} />
@@ -152,7 +152,7 @@ export function JourneyMap() {
     </div> : <div className={compact ? "mx-auto max-w-3xl px-4 pb-16 pt-20" : "sticky top-0 flex h-dvh flex-col px-10 pb-16 pt-24"}>
       <div className="flex items-center justify-between gap-3 border-b border-border pb-3"><p className="font-mono text-xs text-muted-foreground">THE JOURNEY · {end ? "Full circle" : `${String(active + 1).padStart(2, "0")} / ${String(N).padStart(2, "0")}`}</p><Button variant="ghost" size="icon" onClick={close} aria-label="Close journey" title="Close journey"><X /></Button></div>
       <div className={compact ? "" : "grid min-h-0 flex-1 grid-cols-[minmax(260px,360px)_minmax(0,1fr)] items-center gap-8"}>
-        <div className={compact ? "relative mt-4 aspect-[1000/780] overflow-hidden rounded-lg border border-border" : "relative order-2 h-full min-h-0 overflow-hidden"}>{map}
+        <div className={compact ? "relative mt-4 aspect-[1000/780] overflow-hidden rounded-lg border border-border" : "relative order-2 aspect-[1000/780] max-h-[760px] w-full min-h-0 overflow-hidden"}>{map}
           <div className="absolute bottom-3 right-3 flex gap-1 rounded-md border border-border bg-card p-1"><Button variant="ghost" size="icon" onClick={() => setUserZoom(z => clamp(z / 1.15, .85, 1.5))} aria-label="Zoom out" title="Zoom out"><Minus /></Button><Button variant="ghost" size="icon" onClick={() => setUserZoom(z => clamp(z * 1.15, .85, 1.5))} aria-label="Zoom in" title="Zoom in"><Plus /></Button><Button variant="ghost" size="icon" onClick={() => setUserZoom(1)} aria-label="Reset map zoom" title="Reset map zoom"><RotateCcw /></Button></div>
         </div>
         <div className="min-w-0">{end ? <div className="py-8"><p className="font-mono text-xs text-signal">THE NEXT CHAPTER</p><h3 className="mt-4 text-3xl font-bold">A milestone,<br />not a finish line.</h3><p className="mt-4 text-sm leading-relaxed text-muted-foreground">More AI, robotics, and software to build. The heart is full; the journey continues.</p><Button variant="outline" onClick={() => select(0)} className="mt-6"><RotateCcw />Replay journey</Button></div> : <StoryCard stop={stop} index={active} />}</div>

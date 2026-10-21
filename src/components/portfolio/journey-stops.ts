@@ -12,7 +12,7 @@ export const stops: Stop[] = [
     title: "Learning by shipping.", story: "Programming became more than a subject to study. I started shaping **CodeFlex**, my educational website, around making programming more approachable — connecting **web development**, content and the experience of building something useful.",
     stats: [{ v: "1", l: "personal EdTech platform" }] },
   { id: "vcet", badge: "🎓", label: "VCET", date: "2025–2029", place: "Vasai, Maharashtra", color: "var(--pin-3)",
-    title: "Engineering opened new doors.", story: "Joining **Vidyavardhini’s College of Engineering & Technology** for B.Tech in Computer Science and Engineering (**Data Science**) expanded my world beyond programming fundamentals. I began exploring AI, software architecture, robotics and **collaborative product development**.",
+    title: "Engineering opened new doors.", story: "Joining **Vidyavardhini College of Engineering & Technology** for a Bachelor of Engineering in Computer Science Engineering (**Artificial Intelligence & Machine Learning**) expanded my world beyond programming fundamentals. I began exploring AI, software architecture, robotics and **collaborative product development**.",
     stats: [{ v: "2029", l: "graduating" }] },
   { id: "robotics", badge: "⚙", label: "Robotics", date: "2025–2026", place: "VCET · Embedded systems", color: "var(--pin-4)",
     title: "Teaching machines to move.", story: "With **Arduino**, motor drivers and sensor arrays, I worked on a line-following maze robot. **Sensor calibration**, junction detection, dead-end handling and route optimisation taught me that real-world engineering is as much about testing as it is about algorithms." },
