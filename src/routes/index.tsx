@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Nav, Hero, Toolkit, Manifesto, Work, Skills, Ask, Journey, Outro } from "@/components/portfolio/sections";
+import { Nav, Hero, Toolkit, Manifesto, Work, Skills, Ask } from "@/components/portfolio/sections";
 import { Cursor, ScrollMeter, SoundToggle, StatusWidget } from "@/components/portfolio/fx";
 import { Loader } from "@/components/portfolio/Loader";
+import { JourneyMap } from "@/components/portfolio/JourneyMap";
+import { NoteWall } from "@/components/portfolio/NoteWall";
+import { Socials } from "@/components/portfolio/Socials";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -30,8 +33,9 @@ function Index() {
       <Work />
       <Skills />
       <Ask />
-      <Journey />
-      <Outro />
+      <JourneyMap />
+      <NoteWall />
+      <Socials />
       <SoundToggle />
       <StatusWidget />
     </main>

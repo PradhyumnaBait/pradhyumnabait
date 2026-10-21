@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Github, Linkedin, Mail, Send, ArrowUp, Laptop, Cpu, Coffee, Sprout, Server, BookOpen, MousePointerClick, Plus } from "lucide-react";
-import { Cat } from "./Cat";
+import { Drone, Controller } from "./Drone";
 import p1 from "@/assets/polaroid-1.jpg";
 import p2 from "@/assets/polaroid-2.jpg";
 import p3 from "@/assets/polaroid-3.jpg";
@@ -66,7 +66,6 @@ export function Hero() {
               style={{ animationDelay: "250ms", transform: `translate(${m.x * -14}px, ${m.y * -8}px)` }}
             >
               pradhyumna<span className="text-signal">.</span>
-              <Cat />
             </span>
           </h1>
         </div>
@@ -88,6 +87,8 @@ export function Hero() {
         </div>
       </div>
 
+      <Drone />
+      <Controller />
       <div className="relative mx-auto mt-14 flex w-full max-w-7xl flex-wrap items-end justify-between gap-6">
         <p className="text-2xl md:text-3xl">I build intelligent systems.<br />&amp; make them <em className="font-serif">work.</em></p>
         <p className="max-w-xs text-sm text-muted-foreground">Backends, AI inference pipelines &amp; the occasional detour into <span className="text-foreground underline decoration-signal underline-offset-4">distributed ledgers.</span></p>
@@ -435,78 +436,3 @@ export function Ask() {
   );
 }
 
-export function Journey() {
-  const { ref, p } = useScrollProgress<HTMLDivElement>();
-  const icons = [icGrad, icRocket, icTrophy];
-  return (
-    <section className="px-6 py-24">
-      <div className="mx-auto max-w-5xl">
-        <Reveal><h2 className="text-5xl font-bold tracking-tight md:text-7xl">the <em className="font-serif font-normal">journey</em> so far</h2></Reveal>
-        <div ref={ref} className="relative mt-16 pb-[8vh]">
-          <div className="absolute left-6 top-0 h-full w-px bg-border md:left-1/2" />
-          <div className="absolute left-6 top-0 w-[3px] -translate-x-px rounded-full bg-signal shadow-[0_0_16px_var(--signal)] md:left-1/2" style={{ height: `${Math.min(100, p * 140)}%` }} />
-          <div className="space-y-24">
-            {journey.map((j, i) => {
-              const lit = p * 140 > (i / journey.length) * 100 + 5;
-              const left = i % 2 === 0;
-              return (
-                <div key={j.title} className={`relative grid items-center gap-6 pl-16 md:grid-cols-2 md:pl-0`}>
-                  <span className={`absolute left-6 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 transition-all duration-500 md:left-1/2 ${lit ? "scale-125 border-signal bg-signal" : "border-border bg-background"}`} />
-                  <div className={`${left ? "md:order-1 md:pr-16 md:text-right" : "md:order-2 md:pl-16"} transition-all duration-700 ${lit ? "opacity-100 translate-y-0" : "opacity-30 translate-y-6"}`}>
-                    <Tilt max={10} className="rounded-3xl">
-                      <div data-hover className="rounded-3xl border border-border bg-card p-6 shadow-polaroid">
-                        <span className="font-mono text-xs text-signal">{j.year}</span>
-                        <div className="mt-2 text-2xl font-semibold">{j.title}</div>
-                        <div className="mt-1 text-sm text-muted-foreground">{j.place}</div>
-                      </div>
-                    </Tilt>
-                  </div>
-                  <div className={`${left ? "md:order-2 md:pl-16" : "md:order-1 md:pr-16 md:flex md:justify-end"} hidden md:block transition-all duration-700 ${lit ? "scale-100 opacity-100" : "scale-50 opacity-0"}`}>
-                    <FloatIcon src={icons[i % icons.length]!} alt="" className="w-32" delay={i * 0.7} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export function Outro() {
-  const links = [
-    { icon: Mail, label: "email", href: `mailto:${profile.email}` },
-    { icon: Linkedin, label: "linkedin", href: profile.linkedin },
-    { icon: Github, label: "github", href: profile.github },
-  ];
-  const marquee = "open to internships · AI/ML · backend systems · let's build something · ";
-  return (
-    <footer className="grain relative overflow-hidden bg-ink pt-24 text-ink-foreground">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="flex items-center gap-4"><FloatIcon src={icTrophy} alt="trophy" className="w-20" /><p className="font-hand text-3xl text-signal">that's the tour —</p></div>
-        <h2 className="mt-2 text-[14vw] font-extrabold leading-[0.85] tracking-[-0.06em] lg:text-[11rem]">
-          that's all<br /><em className="font-serif font-normal">from me</em><span className="text-signal">.</span>
-        </h2>
-        <div className="mt-14 flex flex-wrap gap-4">
-          {links.map(({ icon: I, label, href }) => (
-            <Magnetic key={label}>
-              <a href={href} target="_blank" rel="noreferrer" onClick={(e) => label === "email" && confetti(e.clientX, e.clientY)} className="flex items-center gap-2 rounded-full border border-ink-foreground/20 px-6 py-3 transition-colors hover:border-signal hover:bg-signal">
-                <I className="h-4 w-4" /> {label}
-              </a>
-            </Magnetic>
-          ))}
-          <a href="#top" className="ml-auto flex items-center gap-2 self-center text-sm text-ink-muted hover:text-ink-foreground">back to top <ArrowUp className="h-4 w-4" /></a>
-        </div>
-      </div>
-      <div className="mt-24 overflow-hidden border-y border-ink-foreground/10 py-5">
-        <div className="animate-marquee flex w-max whitespace-nowrap font-serif text-4xl italic text-ink-muted">
-          <span>{marquee.repeat(4)}</span><span>{marquee.repeat(4)}</span>
-        </div>
-      </div>
-      <div className="mx-auto flex max-w-7xl justify-between px-6 py-6 font-mono text-xs text-ink-muted">
-        <span>© 2026 {profile.fullName}</span><span>{profile.location}</span>
-      </div>
-    </footer>
-  );
-}
