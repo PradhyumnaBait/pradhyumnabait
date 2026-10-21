@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { stops, type Stop } from "./journey-stops";
 import { clamp, easeFrame, journeyStage, routeFraction } from "./journey-motion";
 
-const VW = 1000, VH = 780, CX = 500, CY = 345, S = 19;
+const VW = 1000, VH = 720, CX = 500, CY = 330, S = 19;
 const HEART = Array.from({ length: 721 }, (_, i) => {
   const t = Math.PI + i / 720 * Math.PI * 2;
   const x = CX - 16 * Math.sin(t) ** 3 * S;
@@ -22,8 +22,8 @@ function CityMap() {
     let seed = 7;
     const random = () => ((seed = seed * 16807 % 2147483647) / 2147483647);
     const result = [];
-    for (let x = 0; x < VW; x += 40) for (let y = 0; y < VH; y += 36) {
-      if (random() > .2) result.push({ x: x + 6, y: y + 5, w: 19 + random() * 10, h: 16 + random() * 9 });
+    for (let x = 0; x < VW; x += 70) for (let y = 0; y < VH; y += 60) {
+      if (random() > .35) result.push({ x: x + 8, y: y + 8, w: 30 + random() * 20, h: 24 + random() * 18 });
     }
     return result;
   }, []);
@@ -34,14 +34,14 @@ function CityMap() {
     </defs>
     <rect width={VW} height={VH} fill="var(--map-land)" />
     {blocks.map((b, i) => <g key={i}><rect x={b.x} y={b.y + 2} width={b.w} height={b.h} rx="1" fill="var(--map-block-edge)" /><rect x={b.x} y={b.y} width={b.w} height={b.h} rx="1" fill={i % 4 === 0 ? "var(--map-block-alt)" : "var(--map-block)"} /><rect x={b.x} y={b.y} width={b.w} height={b.h} fill="url(#journey-windows)" opacity=".32" /></g>)}
-    <rect width={VW} height={VH} fill="url(#journey-grid)" />
-    <path d="M765 0 C700 70 855 130 730 225 S850 360 790 450 S900 620 835 780" fill="none" stroke="var(--map-water-edge)" strokeWidth="39" />
-    <path d="M765 0 C700 70 855 130 730 225 S850 360 790 450 S900 620 835 780" fill="none" stroke="var(--map-water)" strokeWidth="31" />
-    {[{ x: 230, y: 255, rx: 60, ry: 38 }, { x: 610, y: 470, rx: 62, ry: 40 }, { x: 440, y: 120, rx: 42, ry: 32 }].map((p, i) => <g key={i}><ellipse cx={p.x} cy={p.y} rx={p.rx} ry={p.ry} fill="var(--map-park)" /><path d={`M${p.x - p.rx} ${p.y}Q${p.x} ${p.y + 24} ${p.x + p.rx} ${p.y - 8}`} fill="none" stroke="var(--map-road)" strokeWidth="3" />{Array.from({ length: 8 }, (_, j) => <circle key={j} cx={p.x - 35 + j * 10} cy={p.y + Math.sin(j * 2) * 18} r="5" fill="var(--map-tree)" />)}</g>)}
-    {[180, 510, 700].map(y => <g key={y}><path d={`M0 ${y}H1000`} stroke="var(--map-block-edge)" strokeWidth="15" /><path d={`M0 ${y}H1000`} stroke="var(--map-road)" strokeWidth="11" /><path d={`M0 ${y}H1000`} stroke="var(--map-highway)" strokeWidth="1" strokeDasharray="8 8" /></g>)}
-    <path d="M0 420L1000 340" stroke="var(--map-road)" strokeWidth="13" /><path d="M0 420L1000 340" stroke="var(--map-highway)" strokeWidth="6" />
-    <text x="465" y="325" textAnchor="middle" fontSize="13" fill="var(--map-label)" fontFamily="JetBrains Mono, monospace">MUMBAI</text>
-    <text x="632" y="572" fontSize="8" fill="var(--map-label)" fontFamily="JetBrains Mono, monospace">VASAI · MAHARASHTRA</text>
+    <ellipse cx="760" cy="150" rx="90" ry="50" fill="var(--map-water)" />
+    <path d="M0 520 C200 480 300 600 520 560 S860 600 1000 540 L1000 580 C860 640 700 610 520 600 S180 520 0 560Z" fill="var(--map-water)" opacity=".8" />
+    {[{ x: 200, y: 200, rx: 80, ry: 55 }, { x: 640, y: 460, rx: 70, ry: 40 }, { x: 425, y: 120, rx: 45, ry: 30 }].map((p, i) => <g key={i}><ellipse cx={p.x} cy={p.y} rx={p.rx} ry={p.ry} fill="var(--map-park)" />{Array.from({ length: 8 }, (_, j) => <circle key={j} cx={p.x - 35 + j * 10} cy={p.y + Math.sin(j * 2) * 18} r="4" fill="var(--map-tree)" opacity=".5" />)}</g>)}
+    {[120, 330, 600].map(y => <path key={y} d={`M0 ${y}H1000`} stroke="var(--map-road)" strokeWidth="10" />)}
+    {[160, 450, 820].map(x => <path key={x} d={`M${x} 0V720`} stroke="var(--map-road)" strokeWidth="10" />)}
+    <path d="M0 40L1000 260" stroke="var(--map-highway)" strokeWidth="8" opacity=".7" />
+    <text x="700" y="120" fontSize="12" fill="var(--map-label)" fontFamily="JetBrains Mono, monospace">ARABIAN SEA ·</text>
+    <text x="230" y="300" fontSize="16" fill="var(--map-label)" opacity=".6" fontFamily="JetBrains Mono, monospace">MUMBAI</text>
   </g>;
 }
 
@@ -74,13 +74,14 @@ export function JourneyMap() {
   const fraction = end ? 1 : routeFraction(stage, N);
   const point = (f: number) => path.current && length ? path.current.getPointAtLength(f * length) : { x: CX, y: CY };
   const targetPoint = point(fraction);
-  const zoom = (!started || end ? 1 : compact ? 1.12 : 1.32) * userZoom;
+  const zoom = (!started || end ? .92 : compact ? 1.05 : 2.3) * userZoom;
   const width = VW / zoom, height = VH / zoom;
   const target = { f: fraction, x: clamp(targetPoint.x - width / 2, Math.min(0, VW - width), Math.max(0, VW - width)), y: clamp(targetPoint.y - height / 2, Math.min(0, VH - height), Math.max(0, VH - height)), w: width, h: height };
   if (!started || end) { target.x = (VW - width) / 2; target.y = (VH - height) / 2; }
+  else if (!compact) target.x = clamp(targetPoint.x - width / 2 - width * .18, 0, Math.max(0, VW - width));
 
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 1023px), (max-height: 680px)");
+    const mq = window.matchMedia("(max-width: 1023px)");
     const update = () => setCompact(mq.matches);
     update(); mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
@@ -129,14 +130,14 @@ export function JourneyMap() {
   };
   const start = () => { setProgress(0); setUserZoom(1); setStarted(true); requestAnimationFrame(() => wrap.current?.scrollIntoView({ behavior: "smooth", block: "start" })); };
   const close = () => { setStarted(false); setProgress(0); setUserZoom(1); requestAnimationFrame(() => wrap.current?.scrollIntoView({ behavior: "instant", block: "start" })); };
-  const map = <svg ref={svg} viewBox={`0 0 ${VW} ${VH}`} preserveAspectRatio="xMidYMid meet" className="h-full w-full" role="img" aria-label="Illustrated heart-shaped journey through Mumbai">
+  const map = <svg ref={svg} viewBox={`0 0 ${VW} ${VH}`} preserveAspectRatio={compact ? "xMidYMid meet" : "xMidYMid slice"} className="h-full w-full" role="img" aria-label="Illustrated heart-shaped journey through Mumbai">
     <CityMap />
-    <path ref={path} d={HEART} fill="none" stroke="var(--map-route)" strokeOpacity={started ? .28 : .65} strokeWidth="3" strokeDasharray={started ? "3 7" : undefined} />
-    <path ref={drawn} d={HEART} fill="none" stroke="var(--map-route)" strokeWidth="3.5" strokeLinecap="round" strokeDasharray={`0 ${length}`} />
+    <path ref={path} d={HEART} fill="none" stroke="var(--map-route)" strokeOpacity={started ? .18 : .65} strokeWidth="6" strokeDasharray={started ? "2 10" : undefined} strokeLinecap="round" />
+    <path ref={drawn} d={HEART} fill="none" stroke="var(--map-route)" strokeWidth="5" strokeLinecap="round" strokeDasharray={`0 ${length}`} />
     {length > 0 && stops.map((st, i) => { const p = point(routeFraction(i, N)); const on = started && !end && i === active; return <g key={st.id} transform={`translate(${p.x} ${p.y})`}>
       <path d="M0 0C-14 -16 -14 -37 0 -37C14 -37 14 -16 0 0Z" fill={st.color} stroke="var(--paper)" strokeWidth={on ? 4 : 2} />
       <circle cy="-24" r="9" fill="var(--paper)" /><text y="-20" textAnchor="middle" fontSize="10" fill="var(--foreground)">{st.badge}</text>
-      {(on || !started || end) && <g transform={`translate(${p.x > CX ? 16 : -16} -24)`}><text textAnchor={p.x > CX ? "start" : "end"} fontSize="12" fontWeight="600" stroke="var(--paper)" strokeWidth="5" paintOrder="stroke" fill="var(--foreground)">{st.label}</text></g>}
+      {(on || !started || end) && <g transform={`translate(${p.x > CX ? 14 : -14 - st.label.length * 7 - 16} ${on ? -40 : -30})`}><rect y="-11" width={st.label.length * 7 + 16} height="20" rx="10" fill="var(--paper)" stroke={st.color} strokeWidth="1.5" /><text x="8" y="3" fontSize="11" fontWeight="600" fill="var(--foreground)">{st.label}</text></g>}
     </g>; })}
     <g ref={arrow} opacity={started ? 1 : 0}><circle r="14" fill="var(--paper)" stroke="var(--map-route)" strokeWidth="1" /><path d="M10 0L-8 -7L-4 0L-8 7Z" fill="var(--map-route)" /></g>
   </svg>;
