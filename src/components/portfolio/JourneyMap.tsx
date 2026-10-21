@@ -143,26 +143,45 @@ export function JourneyMap() {
   </svg>;
   if (!stop) return null;
 
+  const controls = <div className={compact ? "journey-touch-zoom" : "absolute bottom-28 right-8 z-10 flex flex-col rounded-lg border border-border bg-card shadow-polaroid"}>
+    <Button variant="ghost" size="icon" onClick={() => setUserZoom(z => clamp(z / 1.15, .85, 1.5))} aria-label="Zoom out" title="Zoom out"><Minus /></Button>
+    <Button variant="ghost" size="icon" onClick={() => setUserZoom(z => clamp(z * 1.15, .85, 1.5))} aria-label="Zoom in" title="Zoom in"><Plus /></Button>
+    <Button variant="ghost" size="icon" onClick={() => setUserZoom(1)} aria-label="Reset map zoom" title="Reset map zoom"><RotateCcw /></Button>
+  </div>;
+  const story = end ? <div className="py-4"><p className="font-mono text-xs text-signal">THE NEXT CHAPTER</p><h3 className="mt-3 text-2xl font-bold">A milestone, not a finish line.</h3><p className="mt-3 text-sm leading-relaxed text-muted-foreground">More AI, robotics, and software to build. The heart is full; the journey continues.</p><Button variant="outline" onClick={() => select(0)} className="mt-4"><RotateCcw />Replay journey</Button></div> : <StoryCard key={stop.id} stop={stop} index={active} />;
+  const navigation = <nav aria-label="Journey stops" className={compact ? "journey-touch-nav" : "absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 items-center gap-3 rounded-full border border-border bg-card/95 px-3 py-2 shadow-polaroid backdrop-blur"}>
+    <Button variant="ghost" size="icon" onClick={() => select(Math.max(0, (end ? N : active) - 1))} disabled={progress <= .01} aria-label="Previous stop" title="Previous stop"><ArrowLeft /></Button>
+    <div className="flex min-w-0 items-center justify-center gap-0.5">{stops.map((st, i) => <Button key={st.id} variant={i === active && !end ? "default" : "ghost"} size="icon" className={compact ? "h-11 w-7 rounded-md" : "h-8 w-8 rounded-full"} onClick={() => select(i)} aria-label={`Go to ${st.label}`} aria-current={i === active && !end ? "step" : undefined} title={st.label}>{i + 1}</Button>)}</div>
+    {!compact && <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">{end ? "the full heart ♥" : stop.date}</span>}
+    <Button variant="ghost" size="icon" onClick={() => select(Math.min(N, active + 1))} disabled={end} aria-label="Next stop" title="Next stop"><ArrowRight /></Button>
+  </nav>;
   return <section id="journey" ref={wrap} data-started={started} className={`relative border-t border-border bg-background ${started && !compact ? "journey-scroll" : ""}`}>
-    {!started ? <div className="mx-auto max-w-5xl px-5 py-16 text-center md:py-20">
-      <p className="font-mono text-xs uppercase text-muted-foreground">The journey</p>
-      <h2 className="mt-4 text-4xl font-extrabold leading-tight md:text-6xl">Engineer by degree,<br />builder by <em className="font-serif font-normal">obsession.</em></h2>
-      <p className="mt-4 text-sm text-muted-foreground">{N} chapters of curiosity, code, and building in the real world.</p>
-      <div className="journey-preview mx-auto mt-7 aspect-[1000/780] w-full max-w-[560px] overflow-hidden">{map}</div>
-      <Button onClick={start} size="lg" className="relative mt-3 h-12 shadow-polaroid"><MapIcon />View my journey map</Button>
-    </div> : <div className={compact ? "mx-auto max-w-3xl px-4 pb-16 pt-20" : "sticky top-0 flex h-dvh flex-col px-10 pb-16 pt-24"}>
-      <div className={`flex items-center justify-between gap-3 border-b border-border bg-background pb-3 ${compact ? "sticky top-16 z-20" : ""}`}><p className="font-mono text-xs text-muted-foreground">THE JOURNEY · {end ? "Full circle" : `${String(active + 1).padStart(2, "0")} / ${String(N).padStart(2, "0")}`}</p><Button variant="ghost" size="icon" onClick={close} aria-label="Close journey" title="Close journey"><X /></Button></div>
-      <div className={compact ? "" : "grid min-h-0 flex-1 grid-cols-[minmax(260px,360px)_minmax(0,1fr)] items-center gap-8"}>
-        <div className={compact ? "relative mt-4 aspect-[1000/780] overflow-hidden rounded-lg border border-border" : "relative order-2 h-full max-h-[760px] w-full min-h-0 overflow-hidden"}>{map}
-          <div className="absolute bottom-3 right-3 flex gap-1 rounded-md border border-border bg-card p-1"><Button variant="ghost" size="icon" onClick={() => setUserZoom(z => clamp(z / 1.15, .85, 1.5))} aria-label="Zoom out" title="Zoom out"><Minus /></Button><Button variant="ghost" size="icon" onClick={() => setUserZoom(z => clamp(z * 1.15, .85, 1.5))} aria-label="Zoom in" title="Zoom in"><Plus /></Button><Button variant="ghost" size="icon" onClick={() => setUserZoom(1)} aria-label="Reset map zoom" title="Reset map zoom"><RotateCcw /></Button></div>
-        </div>
-        <div className="min-w-0">{end ? <div className="py-8"><p className="font-mono text-xs text-signal">THE NEXT CHAPTER</p><h3 className="mt-4 text-3xl font-bold">A milestone,<br />not a finish line.</h3><p className="mt-4 text-sm leading-relaxed text-muted-foreground">More AI, robotics, and software to build. The heart is full; the journey continues.</p><Button variant="outline" onClick={() => select(0)} className="mt-6"><RotateCcw />Replay journey</Button></div> : <StoryCard stop={stop} index={active} />}</div>
+    {!started ? <div className="journey-intro relative overflow-hidden">
+      <div className="journey-intro-map absolute inset-x-0 bottom-0">{map}</div>
+      <div className="journey-map-vignette pointer-events-none absolute inset-0" />
+      <div className="relative z-10 px-5 pt-20 text-center">
+        <p className="font-mono text-xs uppercase text-muted-foreground">The journey</p>
+        <h2 className="mt-4 text-4xl font-extrabold leading-tight md:text-6xl">Engineer by degree,<br />builder by <em className="font-serif font-normal">obsession.</em></h2>
+        <p className="mt-4 text-sm text-muted-foreground">{N} chapters of curiosity, code, and building in the real world.</p>
       </div>
-      <nav aria-label="Journey stops" className="relative z-10 flex shrink-0 items-center justify-between gap-2 border-t border-border bg-background pt-4">
-        <Button variant="outline" size="icon" onClick={() => select(Math.max(0, (end ? N : active) - 1))} disabled={progress <= .01} aria-label="Previous stop" title="Previous stop"><ArrowLeft /></Button>
-        <div className="flex min-w-0 flex-wrap justify-center gap-1">{stops.map((st, i) => <Button key={st.id} variant={i === active && !end ? "default" : "ghost"} size="icon" className="h-9 w-8" onClick={() => select(i)} aria-label={`Go to ${st.label}`} aria-current={i === active && !end ? "step" : undefined} title={st.label}>{i + 1}</Button>)}</div>
-        <Button variant="outline" size="icon" onClick={() => select(Math.min(N, active + 1))} disabled={end} aria-label="Next stop" title="Next stop"><ArrowRight /></Button>
-      </nav>
+      <Button onClick={start} size="lg" className="absolute bottom-10 left-1/2 z-10 h-12 -translate-x-1/2 whitespace-nowrap shadow-polaroid"><MapIcon />View my journey map</Button>
+    </div> : compact ? <div className="journey-touch-offset">
+      <div className="journey-touch-shell">
+        <div className="journey-touch-map">{map}{controls}</div>
+        <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between bg-card/90 px-4 backdrop-blur"><p className="font-mono text-xs text-muted-foreground">THE JOURNEY · {end ? "Full circle" : `${String(active + 1).padStart(2, "0")} / ${String(N).padStart(2, "0")}`}</p><Button variant="ghost" size="icon" onClick={close} aria-label="Close journey" title="Close journey"><X /></Button></div>
+        <div className="journey-touch-panel">
+          <div key={end ? "end" : stop.id} className="journey-touch-story" tabIndex={0} role="region" aria-label="Current journey story">{story}</div>
+          {navigation}
+        </div>
+      </div>
+    </div> : <div className="sticky top-0 h-dvh overflow-hidden">
+      <div className="absolute inset-0">{map}</div>
+      <div className="journey-map-vignette pointer-events-none absolute inset-0" />
+      <Button variant="outline" size="icon" onClick={close} aria-label="Close journey" title="Close journey" className="absolute right-8 top-20 z-20 bg-card"><X /></Button>
+      <div className="absolute right-8 top-36 z-10 grid h-14 w-14 place-items-center rounded-full border border-border bg-card shadow-polaroid"><svg viewBox="0 0 40 40" className="h-9 w-9" aria-label="Compass"><path d="M20 4L24 20L20 36L16 20Z" fill="var(--signal)" /><path d="M20 20L24 20L20 36L16 20Z" fill="var(--ink)" /><text x="20" y="5" textAnchor="middle" fontSize="5" fill="var(--foreground)">N</text></svg></div>
+      {controls}
+      <div className="journey-desktop-story absolute left-8 top-1/2 z-10 w-[min(26rem,35vw)] -translate-y-1/2 rounded-lg border border-border bg-card p-6 shadow-float">{story}</div>
+      {navigation}
     </div>}
   </section>;
 }
