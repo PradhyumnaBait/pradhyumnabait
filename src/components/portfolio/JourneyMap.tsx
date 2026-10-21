@@ -92,11 +92,11 @@ export function JourneyMap() {
   const pt = (f: number) => (len && pathRef.current ? pathRef.current.getPointAtLength(f * len) : { x: CX, y: CY });
   const plane = pt(routeF || 0.001), ahead = pt(Math.min(1, (routeF || 0.001) + 0.004));
   const ang = (Math.atan2(ahead.y - plane.y, ahead.x - plane.x) * 180) / Math.PI;
-  const target = intro || end ? { x: CX, y: CY + 20 } : pt(frac(active));
-  const zoom = intro || end ? 1 : mobile ? 1.8 : 2.3;
+  const target = intro || end ? { x: CX, y: CY - (mobile ? 0 : 110) } : pt(frac(active));
+  const zoom = intro || end ? (mobile ? 1 : 0.92) : mobile ? 1.8 : 2.3;
   const vw = VW / zoom, vh = VH / zoom;
-  const vx = Math.max(0, Math.min(VW - vw, target.x - vw / 2 - (mobile ? 0 : vw * 0.18)));
-  const vy = Math.max(0, Math.min(VH - vh, target.y - vh / 2));
+  const vx = zoom < 1 ? (VW - vw) / 2 : Math.max(0, Math.min(VW - vw, target.x - vw / 2 - (mobile ? 0 : vw * 0.18)));
+  const vy = zoom < 1 ? target.y - vh / 2 : Math.max(0, Math.min(VH - vh, target.y - vh / 2));
   const stop = stops[active]!;
   const jump = (i: number) => {
     const el = wrap.current; if (!el) return;
@@ -167,7 +167,7 @@ export function JourneyMap() {
   if (mobile) {
     return (
       <section id="journey" className="relative">
-        <div className="sticky top-0 z-0 h-[48vh] overflow-hidden border-b border-border">{map}<Heading show={mActive < 0} /></div>
+        <div className="sticky top-0 z-20 h-[48vh] bg-background overflow-hidden border-b border-border">{map}<Heading show={mActive < 0} /></div>
         <div className="relative z-10 space-y-6 px-4 py-8">
           {stops.map((st, i) => <MobileStop key={st.id} onEnter={() => setMActive(i)}><Card st={st} i={i} /></MobileStop>)}
         </div>

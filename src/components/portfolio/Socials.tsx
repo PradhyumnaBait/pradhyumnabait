@@ -74,7 +74,7 @@ export function Socials() {
       <svg viewBox="0 0 1200 40" preserveAspectRatio="none" className="absolute inset-x-0 top-0 h-8 w-full" aria-hidden><path d="M0 0 H1200 V18 L1170 30 L1130 14 L1090 32 L1040 16 L990 34 L940 18 L890 30 L840 12 L790 28 L740 16 L690 34 L640 14 L590 30 L540 18 L490 34 L440 12 L390 28 L340 16 L290 32 L240 14 L190 30 L140 18 L90 34 L40 16 L0 28Z" fill="var(--background)" /></svg>
 
       <div className="relative mx-auto max-w-5xl px-6 text-center">
-        <h2 className="text-[13vw] font-extrabold leading-[0.9] tracking-[-0.05em] text-paper drop-shadow-[0_4px_24px_oklch(0.3_0.1_250/0.35)] md:text-8xl">
+        <h2 className="text-[13vw] font-extrabold leading-[0.92] tracking-[-0.03em] text-paper drop-shadow-[0_4px_24px_oklch(0.3_0.1_250/0.35)] md:text-8xl">
           Let's build something<br />that actually <span className="relative inline-block"><span className="highlighter absolute inset-x-[-4%] bottom-[8%] top-[45%] -z-0 rounded-sm" /><span className="relative">ships.</span></span>
         </h2>
         <p className="mx-auto mt-6 max-w-md text-lg font-medium text-paper drop-shadow">Open to internships, collaborations and AI projects. I reply fast.</p>
