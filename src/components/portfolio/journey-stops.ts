@@ -1,33 +1,29 @@
-import p1 from "@/assets/polaroid-1.jpg";
-import p2 from "@/assets/polaroid-2.jpg";
-import p3 from "@/assets/polaroid-3.jpg";
-import pvMoksha from "@/assets/preview-moksha.jpg";
-import pvMeddesk from "@/assets/preview-meddesk.jpg";
-import pvTrinetra from "@/assets/preview-trinetra.jpg";
-
 export type Stop = {
   id: string; badge: string; label: string; date: string; place: string; color: string;
   title: string; story: string; stats?: { v: string; l: string }[]; gallery?: { src: string; cap: string }[];
 };
 
-/** Placeholder stories built from the resume — swap in real ones later. **word** = highlight. */
+// Supplied journey draft; approximate dates retained, galleries await real photos.
 export const stops: Stop[] = [
-  { id: "roots", badge: "🏠", label: "Roots", date: "Before 2025", place: "Mumbai", color: "var(--pin-1)",
-    title: "Where the curiosity started.", story: "Growing up in **Mumbai**, I was the kid who took apart remotes to see what was inside. That habit turned into **code** sooner than I expected.",
-    gallery: [{ src: p2, cap: "home" }, { src: p1, cap: "first setup" }] },
-  { id: "vcet", badge: "🎓", label: "VCET", date: "2025 · Vasai", place: "Vidyavardhini College", color: "var(--pin-2)",
-    title: "Picked AI & ML. No looking back.", story: "Started my **B.E. in Computer Science (AI & ML)** at VCET, University of Mumbai — and dove straight into **DSA**, Python and C++.",
-    stats: [{ v: "2029", l: "graduating" }, { v: "4+", l: "certifications" }] },
-  { id: "meddesk", badge: "🩺", label: "MEDDESK", date: "2025 · Healthtech", place: "Hackathon build", color: "var(--pin-3)",
-    title: "Clinics shouldn't feel like queues.", story: "Led the backend for **MEDDESK**, an AI-powered clinic platform with **wait-time prediction** and digital prescriptions.",
-    stats: [{ v: "40%", l: "less waiting (target)" }, { v: "<2 min", l: "OTP booking" }], gallery: [{ src: pvMeddesk, cap: "dashboard" }] },
-  { id: "moksha", badge: "₹", label: "MOKSHA", date: "2025 · Fintech", place: "Distributed systems", color: "var(--pin-4)",
-    title: "Settlement in minutes, not days.", story: "Built **MOKSHA** — T+0 atomic Delivery-versus-Payment using **Hyperledger Fabric** and HTLC cross-ledger orchestration.",
-    stats: [{ v: "<5 min", l: "settlement" }, { v: "5,000", l: "TPS target" }], gallery: [{ src: pvMoksha, cap: "ledger view" }] },
-  { id: "trinetra", badge: "👁", label: "TRINETRA", date: "2026 · Security", place: "Digital forensics", color: "var(--pin-5)",
-    title: "Teaching machines to spot fakes.", story: "**TRINETRA** checks media across four forensic layers — C2PA provenance, audio, video and **phoneme–viseme sync**.",
-    stats: [{ v: "4-layer", l: "pipeline" }], gallery: [{ src: pvTrinetra, cap: "analysis" }] },
-  { id: "now", badge: "🚀", label: "Now", date: "2026 · Now", place: "Mumbai", color: "var(--pin-6)",
-    title: "Hackathons, and whatever's next.", story: "National **hackathons** across fintech, healthtech and security. Currently looking for **internships** and interesting collaborations.",
-    gallery: [{ src: p3, cap: "hackathon nights" }] },
+  { id: "foundations", badge: "⌘", label: "Foundations", date: "2022–2024", place: "First computer courses", color: "var(--pin-1)",
+    title: "Before the first commit.", story: "I started by exploring computers and turning **curiosity** into practical skills. Courses in Digital Computerisation, Web Designing, **C++ OOP** and **Python** gave me the foundation to move from using technology to creating with it.",
+    stats: [{ v: "4", l: "certifications" }] },
+  { id: "codeflex", badge: "</>", label: "CodeFlex", date: "2025", place: "Independent project", color: "var(--pin-2)",
+    title: "Learning by shipping.", story: "Programming became more than a subject to study. I started shaping **CodeFlex**, my educational website, around making programming more approachable — connecting **web development**, content and the experience of building something useful.",
+    stats: [{ v: "1", l: "personal EdTech platform" }] },
+  { id: "vcet", badge: "🎓", label: "VCET", date: "2025–2029", place: "Vasai, Maharashtra", color: "var(--pin-3)",
+    title: "Engineering opened new doors.", story: "Joining **Vidyavardhini’s College of Engineering & Technology** for B.Tech in Computer Science and Engineering (**Data Science**) expanded my world beyond programming fundamentals. I began exploring AI, software architecture, robotics and **collaborative product development**.",
+    stats: [{ v: "2029", l: "graduating" }] },
+  { id: "robotics", badge: "⚙", label: "Robotics", date: "2025–2026", place: "VCET · Embedded systems", color: "var(--pin-4)",
+    title: "Teaching machines to move.", story: "With **Arduino**, motor drivers and sensor arrays, I worked on a line-following maze robot. **Sensor calibration**, junction detection, dead-end handling and route optimisation taught me that real-world engineering is as much about testing as it is about algorithms." },
+  { id: "products", badge: "₹", label: "Products", date: "2025–2026", place: "HealthTech · FinTech", color: "var(--pin-5)",
+    title: "Solving problems, not just writing code.", story: "**MEDDESK** explores smarter clinic appointments and queue management, while **MOKSHA** investigates blockchain-enabled financial settlement. Both pushed me to think about complete systems — users, workflows, APIs, data, reliability and **system architecture**." },
+  { id: "applied-ai", badge: "✦", label: "Applied AI", date: "2026", place: "Healthcare · Digital trust", color: "var(--pin-6)",
+    title: "Making intelligence useful.", story: "I explored AI across digital forensics, misinformation detection and healthcare. **TRINETRA** focuses on cross-modal deepfake detection, **JanRakshak AI** explores civic fact-checking and media analysis, and **MediKiosk** proposes multimodal clinical intake for Ayush OPDs." },
+  { id: "hackathons", badge: "🏆", label: "Hackathons", date: "2026", place: "Mumbai · Community & college", color: "var(--pin-2)",
+    title: "Ideas into working prototypes.", story: "Hackathons became a place to experiment, collaborate and build under tight deadlines. I contributed across web development, AI, cloud and data-driven applications — reaching **multiple finals** and celebrating a **win at VNPS 2026**.",
+    stats: [{ v: "8", l: "hackathons" }] },
+  { id: "iit-bombay", badge: "★", label: "IIT Bombay", date: "October 2026", place: "Zonal Techfest · Mesmerize", color: "var(--pin-4)",
+    title: "Fifth place. More to build.", story: "Securing **5th position** in the **IIT Bombay Zonal Techfest Mesmerize competition** became a new milestone. Every competition adds another lesson in engineering, execution and teamwork. I’m taking those lessons into more ambitious AI, robotics and software projects.",
+    stats: [{ v: "5th", l: "competition position" }] },
 ];
