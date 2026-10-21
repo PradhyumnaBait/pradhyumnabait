@@ -130,7 +130,7 @@ export function JourneyMap() {
   };
   const start = () => { setProgress(0); setUserZoom(1); setStarted(true); requestAnimationFrame(() => wrap.current?.scrollIntoView({ behavior: "smooth", block: "start" })); };
   const close = () => { setStarted(false); setProgress(0); setUserZoom(1); requestAnimationFrame(() => wrap.current?.scrollIntoView({ behavior: "instant", block: "start" })); };
-  const map = <svg ref={svg} viewBox={`0 0 ${VW} ${VH}`} preserveAspectRatio={compact ? "xMidYMid meet" : "xMidYMid slice"} className="h-full w-full" role="img" aria-label="Illustrated heart-shaped journey through Mumbai">
+  const map = <svg ref={svg} viewBox={`0 0 ${VW} ${VH}`} preserveAspectRatio={compact || !started ? "xMidYMid meet" : "xMidYMid slice"} className="h-full w-full" role="img" aria-label="Illustrated heart-shaped journey through Mumbai">
     <CityMap />
     <path ref={path} d={HEART} fill="none" stroke="var(--map-route)" strokeOpacity={started ? .18 : .65} strokeWidth="6" strokeDasharray={started ? "2 10" : undefined} strokeLinecap="round" />
     <path ref={drawn} d={HEART} fill="none" stroke="var(--map-route)" strokeWidth="5" strokeLinecap="round" strokeDasharray={`0 ${length}`} />
