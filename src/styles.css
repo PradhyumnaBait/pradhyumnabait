@@ -137,6 +137,9 @@
   --drone-dome: oklch(0.3 0.01 250); --drone-motor: oklch(0.82 0.15 80); --drone-lens: oklch(0.6 0.18 255); --btn-green: oklch(0.75 0.17 155);
   --map-land: oklch(0.96 0.012 90); --map-block: oklch(0.92 0.012 85); --map-road: oklch(0.99 0.003 85); --map-highway: oklch(0.9 0.08 90);
   --map-water: oklch(0.85 0.06 230); --map-park: oklch(0.88 0.07 145); --map-route: oklch(0.6 0.19 255);
+  --map-block-edge: oklch(0.81 0.015 85); --map-block-alt: oklch(0.88 0.015 85);
+  --map-roof: oklch(0.74 0.018 85); --map-water-edge: oklch(0.76 0.08 230);
+  --map-tree: oklch(0.73 0.09 145); --map-label: oklch(0.52 0.025 85);
   --pin-1: oklch(0.72 0.15 160); --pin-2: oklch(0.65 0.16 255); --pin-3: oklch(0.65 0.2 0); --pin-4: oklch(0.6 0.2 30); --pin-5: oklch(0.45 0.18 300); --pin-6: oklch(0.78 0.15 75);
   --note-yellow: oklch(0.93 0.1 95); --note-pink: oklch(0.88 0.07 15); --note-mint: oklch(0.9 0.07 160); --note-lilac: oklch(0.87 0.07 300); --note-blue: oklch(0.88 0.06 240); --note-peach: oklch(0.89 0.07 60);
   --key-red: oklch(0.6 0.21 27); --key-blue: oklch(0.55 0.17 255); --key-pink: oklch(0.6 0.22 350); --key-yellow: oklch(0.86 0.17 95);
@@ -155,3 +158,9 @@
 .highlighter { background: var(--key-yellow); transform-origin: left; animation: hl 1s .4s cubic-bezier(.2,.7,.2,1) both; transform: skew(-6deg); }
 .cloud-drift { background: radial-gradient(closest-side, oklch(1 0 0 / .7), transparent) 0 0 / 30% 100% repeat-x; animation: marquee 60s linear infinite; }
 @media (prefers-reduced-motion: reduce) { .drone-prop, .radio-ring, .cloud-drift { animation: none; } }
+
+.journey-scroll { height: 640vh; }
+.journey-preview { mask-image: radial-gradient(ellipse at center, var(--ink) 48%, transparent 73%); }
+.journey-story { animation: journey-story-in .35s ease-out; }
+@keyframes journey-story-in { from { opacity: .4; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .journey-story { animation: none; } }

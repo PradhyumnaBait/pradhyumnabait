@@ -1,17 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { Mail, Github, Linkedin, Instagram, ArrowDown, Copy, Check, ArrowUp } from "lucide-react";
 import sky from "@/assets/sky.jpg";
+import resume from "@/assets/resume.asset.json";
 import { profile } from "./data";
 import { blip, confetti } from "./fx";
 
 type Key = { k: string; label: string; note: string; href: string; icon: typeof Mail; bg: string; fg: string; dl?: boolean };
-// Placeholder links: swap in real Instagram + resume when provided.
+// Instagram remains a placeholder until a personal link is supplied.
 const KEYS: Key[] = [
   { k: "g", label: "Gmail", note: "Projects, roles, or just hi.", href: `mailto:${profile.email}`, icon: Mail, bg: "var(--key-red)", fg: "var(--paper)" },
   { k: "h", label: "GitHub", note: "Where I build in public.", href: profile.github, icon: Github, bg: "var(--ink)", fg: "var(--paper)" },
   { k: "l", label: "LinkedIn", note: "The work, and what I learned doing it.", href: profile.linkedin, icon: Linkedin, bg: "var(--key-blue)", fg: "var(--paper)" },
   { k: "i", label: "Instagram", note: "Behind the scenes.", href: "https://instagram.com/", icon: Instagram, bg: "var(--key-pink)", fg: "var(--paper)" },
-  { k: "r", label: "Resume", note: "My resume, one click away.", href: "/resume.pdf", icon: ArrowDown, bg: "var(--key-yellow)", fg: "var(--ink)", dl: true },
+  { k: "r", label: "Resume", note: "My resume, one click away.", href: resume.url, icon: ArrowDown, bg: "var(--key-yellow)", fg: "var(--ink)", dl: true },
 ];
 
 function Keycap({ d, pressed, onPress }: { d: Key; pressed: boolean; onPress: () => void }) {
@@ -26,7 +27,7 @@ function Keycap({ d, pressed, onPress }: { d: Key; pressed: boolean; onPress: ()
       </span>
       <a ref={ref} href={d.href} target={d.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" download={d.dl || undefined} aria-label={d.label}
         onClick={onPress}
-        onPointerMove={(e) => { const r = ref.current!.getBoundingClientRect(); setT({ x: (e.clientX - r.left) / r.width - 0.5, y: (e.clientY - r.top) / r.height - 0.5, on: true }); }}
+        onPointerMove={(e) => { const r = ref.current?.getBoundingClientRect(); if (!r) return; setT({ x: (e.clientX - r.left) / r.width - 0.5, y: (e.clientY - r.top) / r.height - 0.5, on: true }); }}
         onPointerLeave={() => setT({ x: 0, y: 0, on: false })}
         className="relative block h-16 w-16 md:h-20 md:w-20" style={{ perspective: 400 }}>
         <span className="absolute inset-0 translate-y-[6px] rounded-2xl" style={{ background: d.bg, filter: "brightness(.6)" }} />

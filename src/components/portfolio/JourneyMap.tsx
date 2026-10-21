@@ -1,224 +1,167 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { Map as MapIcon, Plus, Minus } from "lucide-react";
-import { stops } from "./journey-stops";
+import { Map as MapIcon, Plus, Minus, ArrowLeft, ArrowRight, X, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { stops, type Stop } from "./journey-stops";
+import { clamp, easeFrame, journeyStage, routeFraction } from "./journey-motion";
 
-const VW = 1000, VH = 720, CX = 500, CY = 330, S = 19;
-function heartPath() {
-  const pts: string[] = [];
-  for (let i = 0; i <= 200; i++) {
-    const t = Math.PI + (i / 200) * Math.PI * 2; // start at bottom tip, go around
-    const x = 16 * Math.pow(Math.sin(t), 3);
-    const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-    pts.push(`${i ? "L" : "M"}${(CX - x * S).toFixed(1)} ${(CY - y * S).toFixed(1)}`);
-  }
-  return pts.join(" ");
-}
-const HEART = heartPath();
+const VW = 1000, VH = 780, CX = 500, CY = 345, S = 19;
+const HEART = Array.from({ length: 721 }, (_, i) => {
+  const t = Math.PI + i / 720 * Math.PI * 2;
+  const x = CX - 16 * Math.sin(t) ** 3 * S;
+  const y = CY - (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * S;
+  return `${i ? "L" : "M"}${x.toFixed(3)} ${y.toFixed(3)}`;
+}).join(" ");
 const N = stops.length;
-const frac = (i: number) => 0.04 + (i / (N - 1)) * 0.92;
 
-function rich(s: string) {
-  return s.split(/(\*\*[^*]+\*\*)/).map((p, i) =>
-    p.startsWith("**") ? <strong key={i} className="font-semibold text-foreground underline decoration-signal decoration-2 underline-offset-4">{p.slice(2, -2)}</strong> : <Fragment key={i}>{p}</Fragment>,
-  );
+function rich(text: string) {
+  return text.split(/(\*\*[^*]+\*\*)/).map((p, i) => p.startsWith("**") ? <strong key={i} className="font-semibold text-foreground underline decoration-signal decoration-2 underline-offset-4">{p.slice(2, -2)}</strong> : <Fragment key={i}>{p}</Fragment>);
 }
 
-/** Static illustrated city map (deterministic). */
 function CityMap() {
   const blocks = useMemo(() => {
-    const out: { x: number; y: number; w: number; h: number }[] = [];
     let seed = 7;
-    const r = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
-    for (let x = 0; x < VW; x += 70) for (let y = 0; y < VH; y += 60) if (r() > 0.35) out.push({ x: x + 8 + r() * 6, y: y + 8 + r() * 6, w: 30 + r() * 20, h: 24 + r() * 18 });
-    return out;
+    const random = () => ((seed = seed * 16807 % 2147483647) / 2147483647);
+    const result = [];
+    for (let x = 0; x < VW; x += 40) for (let y = 0; y < VH; y += 36) {
+      if (random() > .2) result.push({ x: x + 6, y: y + 5, w: 19 + random() * 10, h: 16 + random() * 9 });
+    }
+    return result;
   }, []);
-  return (
-    <g>
-      <rect width={VW} height={VH} fill="var(--map-land)" />
-      {blocks.map((b, i) => <rect key={i} x={b.x} y={b.y} width={b.w} height={b.h} rx="3" fill="var(--map-block)" />)}
-      <ellipse cx="760" cy="150" rx="90" ry="50" fill="var(--map-water)" />
-      <path d="M0 520 C200 480 300 600 520 560 S860 600 1000 540 L1000 580 C860 640 700 610 520 600 S180 520 0 560Z" fill="var(--map-water)" opacity=".8" />
-      <ellipse cx="200" cy="200" rx="80" ry="55" fill="var(--map-park)" />
-      <ellipse cx="640" cy="460" rx="70" ry="40" fill="var(--map-park)" />
-      <rect x="380" y="90" width="90" height="60" rx="10" fill="var(--map-park)" />
-      {[120, 330, 600].map((y) => <rect key={y} x="0" y={y} width={VW} height="10" fill="var(--map-road)" />)}
-      {[160, 450, 820].map((x) => <rect key={x} x={x} y="0" width="10" height={VH} fill="var(--map-road)" />)}
-      <path d="M0 40 L1000 260" stroke="var(--map-highway)" strokeWidth="8" opacity=".7" />
-      <text x="700" y="120" fontSize="12" letterSpacing="4" fill="var(--muted-foreground)" fontFamily="JetBrains Mono, monospace">ARABIAN SEA ·</text>
-      <text x="230" y="300" fontSize="16" letterSpacing="8" fill="var(--muted-foreground)" opacity=".6" fontFamily="JetBrains Mono, monospace">MUMBAI</text>
-    </g>
-  );
+  return <g aria-hidden="true">
+    <defs>
+      <pattern id="journey-grid" width="40" height="36" patternUnits="userSpaceOnUse"><path d="M40 0H0V36" fill="none" stroke="var(--map-road)" strokeWidth="5" /></pattern>
+      <pattern id="journey-windows" width="8" height="8" patternUnits="userSpaceOnUse"><rect x="2" y="2" width="2" height="2" fill="var(--map-roof)" /></pattern>
+    </defs>
+    <rect width={VW} height={VH} fill="var(--map-land)" />
+    {blocks.map((b, i) => <g key={i}><rect x={b.x} y={b.y + 2} width={b.w} height={b.h} rx="1" fill="var(--map-block-edge)" /><rect x={b.x} y={b.y} width={b.w} height={b.h} rx="1" fill={i % 4 === 0 ? "var(--map-block-alt)" : "var(--map-block)"} /><rect x={b.x} y={b.y} width={b.w} height={b.h} fill="url(#journey-windows)" opacity=".32" /></g>)}
+    <rect width={VW} height={VH} fill="url(#journey-grid)" />
+    <path d="M765 0 C700 70 855 130 730 225 S850 360 790 450 S900 620 835 780" fill="none" stroke="var(--map-water-edge)" strokeWidth="39" />
+    <path d="M765 0 C700 70 855 130 730 225 S850 360 790 450 S900 620 835 780" fill="none" stroke="var(--map-water)" strokeWidth="31" />
+    {[{ x: 230, y: 255, rx: 60, ry: 38 }, { x: 610, y: 470, rx: 62, ry: 40 }, { x: 440, y: 120, rx: 42, ry: 32 }].map((p, i) => <g key={i}><ellipse cx={p.x} cy={p.y} rx={p.rx} ry={p.ry} fill="var(--map-park)" /><path d={`M${p.x - p.rx} ${p.y}Q${p.x} ${p.y + 24} ${p.x + p.rx} ${p.y - 8}`} fill="none" stroke="var(--map-road)" strokeWidth="3" />{Array.from({ length: 8 }, (_, j) => <circle key={j} cx={p.x - 35 + j * 10} cy={p.y + Math.sin(j * 2) * 18} r="5" fill="var(--map-tree)" />)}</g>)}
+    {[180, 510, 700].map(y => <g key={y}><path d={`M0 ${y}H1000`} stroke="var(--map-block-edge)" strokeWidth="15" /><path d={`M0 ${y}H1000`} stroke="var(--map-road)" strokeWidth="11" /><path d={`M0 ${y}H1000`} stroke="var(--map-highway)" strokeWidth="1" strokeDasharray="8 8" /></g>)}
+    <path d="M0 420L1000 340" stroke="var(--map-road)" strokeWidth="13" /><path d="M0 420L1000 340" stroke="var(--map-highway)" strokeWidth="6" />
+    <text x="465" y="325" textAnchor="middle" fontSize="13" fill="var(--map-label)" fontFamily="JetBrains Mono, monospace">MUMBAI</text>
+    <text x="632" y="572" fontSize="8" fill="var(--map-label)" fontFamily="JetBrains Mono, monospace">VASAI · MAHARASHTRA</text>
+  </g>;
+}
+
+function StoryCard({ stop, index }: { stop: Stop; index: number }) {
+  return <article className="journey-story min-w-0 py-4 md:py-6" aria-live="polite">
+    <div className="flex items-center gap-3"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-secondary text-xl">{stop.badge}</span><div className="min-w-0"><p className="font-semibold">{stop.label}</p><p className="text-xs leading-relaxed text-muted-foreground">{stop.date} · {stop.place}</p></div><span className="ml-auto shrink-0 font-mono text-xs text-muted-foreground">{String(index + 1).padStart(2, "0")} / {String(N).padStart(2, "0")}</span></div>
+    <h3 className="mt-5 text-2xl font-bold leading-tight md:text-3xl">{stop.title}</h3>
+    <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{rich(stop.story)}</p>
+    {stop.stats && <div className="mt-5 flex flex-wrap gap-x-7 gap-y-3">{stop.stats.map(s => <div key={s.l}><p className="text-xl font-bold text-signal">{s.v}</p><p className="text-xs text-muted-foreground">{s.l}</p></div>)}</div>}
+    {stop.gallery && <div className="mt-5 flex gap-3">{stop.gallery.map(g => <figure key={g.cap} className="w-24"><img src={g.src} alt={g.cap} className="aspect-[4/3] w-full rounded-md object-cover" loading="lazy" /><figcaption className="mt-1 text-xs text-muted-foreground">{g.cap}</figcaption></figure>)}</div>}
+  </article>;
 }
 
 export function JourneyMap() {
-  const wrap = useRef<HTMLDivElement>(null);
-  const pathRef = useRef<SVGPathElement>(null);
-  const [len, setLen] = useState(0);
-  const [prog, setProg] = useState(0); // continuous stage 0..N+1
-  const [mobile, setMobile] = useState(false);
-  const [mActive, setMActive] = useState(-1);
+  const wrap = useRef<HTMLElement>(null);
+  const svg = useRef<SVGSVGElement>(null);
+  const path = useRef<SVGPathElement>(null);
+  const drawn = useRef<SVGPathElement>(null);
+  const arrow = useRef<SVGGElement>(null);
+  const motion = useRef({ f: 0, x: 0, y: 0, w: VW, h: VH });
+  const [length, setLength] = useState(0);
+  const [started, setStarted] = useState(false);
+  const [compact, setCompact] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [userZoom, setUserZoom] = useState(1);
+  const stage = journeyStage(started, progress, N);
+  const end = stage >= N - .15;
+  const active = clamp(Math.round(stage), 0, N - 1);
+  const stop = stops[active];
+  const fraction = end ? 1 : routeFraction(stage, N);
+  const point = (f: number) => path.current && length ? path.current.getPointAtLength(f * length) : { x: CX, y: CY };
+  const targetPoint = point(fraction);
+  const zoom = (!started || end ? 1 : compact ? 1.12 : 1.32) * userZoom;
+  const width = VW / zoom, height = VH / zoom;
+  const target = { f: fraction, x: clamp(targetPoint.x - width / 2, Math.min(0, VW - width), Math.max(0, VW - width)), y: clamp(targetPoint.y - height / 2, Math.min(0, VH - height), Math.max(0, VH - height)), w: width, h: height };
+  if (!started || end) { target.x = (VW - width) / 2; target.y = (VH - height) / 2; }
 
   useEffect(() => {
-    setLen(pathRef.current?.getTotalLength() ?? 0);
-    const mq = window.matchMedia("(max-width: 767px)");
-    const upd = () => setMobile(mq.matches);
-    upd(); mq.addEventListener("change", upd);
-    return () => mq.removeEventListener("change", upd);
+    const mq = window.matchMedia("(max-width: 1023px), (max-height: 680px)");
+    const update = () => setCompact(mq.matches);
+    update(); mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
   }, []);
-
+  useEffect(() => { setLength(path.current?.getTotalLength() ?? 0); }, [started, compact]);
   useEffect(() => {
-    if (mobile) return;
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
+    if (!started || compact) return;
+    let frame = 0;
+    const update = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
         const el = wrap.current; if (!el) return;
-        const r = el.getBoundingClientRect();
-        const p = Math.min(1, Math.max(0, -r.top / (r.height - window.innerHeight)));
-        setProg(p * (N + 1));
+        const rect = el.getBoundingClientRect();
+        setProgress(clamp(-rect.top / Math.max(1, rect.height - window.innerHeight), 0, 1) * N);
       });
     };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
-  }, [mobile]);
-
-  // stage mapping
-  const s = mobile ? (mActive < 0 ? 0 : mActive + 1) : prog;
-  const intro = s < 0.6, end = s > N + 0.4;
-  const active = Math.min(N - 1, Math.max(0, Math.round(s - 1)));
-  const cont = Math.min(N - 1, Math.max(0, s - 1)); // continuous stop index
-  const routeF = end ? 1 : intro ? 0 : frac(Math.floor(cont)) + (frac(Math.min(N - 1, Math.floor(cont) + 1)) - frac(Math.floor(cont))) * (cont % 1);
-  const pt = (f: number) => (len && pathRef.current ? pathRef.current.getPointAtLength(f * len) : { x: CX, y: CY });
-  const plane = pt(routeF || 0.001), ahead = pt(Math.min(1, (routeF || 0.001) + 0.004));
-  const ang = (Math.atan2(ahead.y - plane.y, ahead.x - plane.x) * 180) / Math.PI;
-  const target = intro || end ? { x: CX, y: CY - (mobile ? 0 : 110) } : pt(frac(active));
-  const zoom = intro || end ? (mobile ? 1 : 0.92) : mobile ? 1.8 : 2.3;
-  const vw = VW / zoom, vh = VH / zoom;
-  const vx = zoom < 1 ? (VW - vw) / 2 : Math.max(0, Math.min(VW - vw, target.x - vw / 2 - (mobile ? 0 : vw * 0.18)));
-  const vy = zoom < 1 ? target.y - vh / 2 : Math.max(0, Math.min(VH - vh, target.y - vh / 2));
-  const stop = stops[active]!;
-  const jump = (i: number) => {
-    const el = wrap.current; if (!el) return;
-    const top = el.offsetTop + ((i + 1) / (N + 1)) * (el.offsetHeight - window.innerHeight) + 2;
-    window.scrollTo({ top, behavior: "smooth" });
-  };
-
-  const map = (
-    <svg viewBox={`${vx} ${vy} ${vw} ${vh}`} preserveAspectRatio="xMidYMid slice" className="h-full w-full transition-[all]" style={{ transition: "none" }}>
-      <CityMap />
-      <path ref={pathRef} d={HEART} fill="none" stroke="var(--map-route)" strokeOpacity=".18" strokeWidth="6" strokeDasharray="2 10" strokeLinecap="round" />
-      {len > 0 && <path d={HEART} fill="none" stroke="var(--map-route)" strokeWidth="5" strokeLinecap="round" strokeDasharray={`${routeF * len} ${len}`} />}
-      {len > 0 && stops.map((st, i) => {
-        const p = pt(frac(i));
-        const lit = end || intro || i <= active;
-        const on = !intro && !end && i === active;
-        return (
-          <g key={st.id} transform={`translate(${p.x} ${p.y})`} className="cursor-pointer" onClick={() => (mobile ? setMActive(i) : jump(i))}>
-            <g style={{ transform: `scale(${on ? 1.35 : 1})`, transformOrigin: "0 0", transition: "transform .4s cubic-bezier(.3,1.6,.5,1)" }}>
-              <path d="M0 0 C-14 -16 -14 -36 0 -36 C14 -36 14 -16 0 0Z" fill={st.color} opacity={lit ? 1 : 0.35} stroke="var(--paper)" strokeWidth="2.5" />
-              <circle cy="-24" r="8" fill="var(--paper)" />
-              <text y="-20" textAnchor="middle" fontSize="10">{st.badge}</text>
-            </g>
-            {(on || intro || end) && (
-              <g transform={`translate(14 ${on ? -40 : -30})`}>
-                <rect x="0" y="-11" width={st.label.length * 7 + 16} height="20" rx="10" fill="var(--paper)" stroke={st.color} strokeWidth="1.5" />
-                <text x="8" y="3" fontSize="11" fontWeight="600" fill="var(--foreground)">{st.label}</text>
-              </g>
-            )}
-          </g>
-        );
-      })}
-      {len > 0 && !intro && (
-        <g transform={`translate(${plane.x} ${plane.y}) rotate(${ang})`}>
-          <circle r="14" fill="var(--map-route)" opacity=".18" />
-          <path d="M10 0 L-8 -7 L-4 0 L-8 7 Z" fill="var(--map-route)" stroke="var(--paper)" strokeWidth="1.5" />
-        </g>
-      )}
-    </svg>
-  );
-
-  const Card = ({ st, i }: { st: typeof stop; i: number }) => (
-    <div className="w-full rounded-3xl border border-border bg-card p-5 shadow-float md:p-6">
-      <div className="flex items-center gap-3">
-        <span className="grid h-10 w-10 place-items-center rounded-xl text-lg" style={{ background: st.color }}>{st.badge}</span>
-        <div className="min-w-0 flex-1"><div className="font-semibold">{st.label}</div><div className="text-xs text-muted-foreground">{st.date} · {st.place}</div></div>
-        <span className="font-mono text-xs text-muted-foreground">{String(i + 1).padStart(2, "0")} / {String(N).padStart(2, "0")}</span>
-      </div>
-      <h3 className="mt-5 text-2xl font-bold leading-tight tracking-tight md:text-3xl">{st.title}</h3>
-      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{rich(st.story)}</p>
-      {st.stats && <div className="mt-4 flex gap-8">{st.stats.map((x) => <div key={x.l}><div className="text-2xl font-extrabold text-signal">{x.v}</div><div className="text-xs text-muted-foreground">{x.l}</div></div>)}</div>}
-      {st.gallery && (
-        <div className="mt-4"><div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">gallery</div>
-          <div className="mt-2 flex gap-2">{st.gallery.map((g) => <figure key={g.cap} className="w-20"><img src={g.src} alt={g.cap} loading="lazy" className="aspect-square w-full rounded-lg object-cover transition-transform hover:scale-105" /><figcaption className="mt-1 text-center text-[10px] text-muted-foreground">{g.cap}</figcaption></figure>)}</div>
-        </div>
-      )}
-    </div>
-  );
-
-  const Heading = ({ show }: { show: boolean }) => (
-    <div className={`pointer-events-none absolute inset-x-0 top-16 z-10 px-6 text-center transition-all duration-700 ${show ? "opacity-100" : "-translate-y-8 opacity-0"}`}>
-      <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground">the journey</p>
-      <h2 className="mt-3 text-4xl font-extrabold leading-[0.95] tracking-tight md:text-6xl">Engineer by degree,<br />builder by <em className="font-serif font-normal">obsession.</em></h2>
-      <p className="mt-3 text-sm text-muted-foreground">{N} stops between Mumbai and now. Scroll to walk the path.</p>
-    </div>
-  );
-
-  if (mobile) {
-    return (
-      <section id="journey" className="relative">
-        <div className="sticky top-0 z-20 h-[48vh] bg-background overflow-hidden border-b border-border">{map}<Heading show={mActive < 0} /></div>
-        <div className="relative z-10 space-y-6 px-4 py-8">
-          {stops.map((st, i) => <MobileStop key={st.id} onEnter={() => setMActive(i)}><Card st={st} i={i} /></MobileStop>)}
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section id="journey" ref={wrap} className="relative" style={{ height: `${(N + 2) * 100}vh` }}>
-      <div className="sticky top-0 h-screen overflow-hidden">
-        <div className="absolute inset-0">{map}</div>
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,var(--background)_100%)]" />
-        <Heading show={intro || end} />
-        {/* compass */}
-        <div className="absolute right-8 top-24 grid h-14 w-14 place-items-center rounded-full border border-border bg-card shadow-polaroid" style={{ transform: `rotate(${s * -40}deg)`, transition: "transform .3s" }}>
-          <svg viewBox="0 0 40 40" className="h-9 w-9"><path d="M20 4 L24 20 L20 36 L16 20Z" fill="var(--signal)" /><path d="M20 20 L24 20 L20 36 L16 20Z" fill="var(--ink)" /><text x="20" y="3.5" textAnchor="middle" fontSize="5" fill="var(--foreground)">N</text></svg>
-        </div>
-        <div className="absolute bottom-28 right-8 flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-polaroid" aria-hidden>
-          <span className="p-2"><Plus className="h-4 w-4" /></span><span className="border-t border-border p-2"><Minus className="h-4 w-4" /></span>
-        </div>
-        {/* story card */}
-        <div className={`absolute left-8 top-1/2 w-[min(26rem,40vw)] -translate-y-1/2 transition-all duration-500 ${intro || end ? "pointer-events-none -translate-x-12 opacity-0" : "opacity-100"}`}>
-          <div key={stop.id} className="animate-rise"><Card st={stop} i={active} /></div>
-        </div>
-        {end && (
-          <button type="button" onClick={() => jump(0)} className="animate-rise absolute bottom-24 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-medium shadow-polaroid hover:border-signal">
-            <MapIcon className="h-4 w-4" /> View journey map
-          </button>
-        )}
-        {/* progress dots */}
-        <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-3 rounded-full border border-border bg-card/90 px-4 py-2 shadow-polaroid backdrop-blur">
-          <div className="flex gap-1.5">
-            {stops.map((st, i) => (
-              <button key={st.id} type="button" aria-label={`Go to ${st.label}`} onClick={() => jump(i)}
-                className="h-2.5 rounded-full transition-all" style={{ width: !intro && !end && i === active ? 22 : 10, background: end || (!intro && i <= active) ? st.color : "var(--border)" }} />
-            ))}
-          </div>
-          <span className="font-mono text-[11px] text-muted-foreground">{intro ? "Mumbai → now" : end ? "the full heart ♥" : stop.date}</span>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function MobileStop({ children, onEnter }: { children: React.ReactNode; onEnter: () => void }) {
-  const ref = useRef<HTMLDivElement>(null);
+    update(); window.addEventListener("scroll", update, { passive: true });
+    return () => { cancelAnimationFrame(frame); window.removeEventListener("scroll", update); };
+  }, [started, compact]);
   useEffect(() => {
-    const el = ref.current; if (!el) return;
-    const io = new IntersectionObserver(([e]) => e?.isIntersecting && onEnter(), { rootMargin: "-55% 0px -35% 0px" });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [onEnter]);
-  return <div ref={ref}>{children}</div>;
+    if (!length) return;
+    let frame = 0, previous = performance.now();
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const tick = (time: number) => {
+      const current = motion.current;
+      const dt = time - previous; previous = time;
+      for (const key of ["f", "x", "y", "w", "h"] as const) current[key] = reduced ? target[key] : easeFrame(current[key], target[key], dt);
+      svg.current?.setAttribute("viewBox", `${current.x} ${current.y} ${current.w} ${current.h}`);
+      drawn.current?.setAttribute("stroke-dasharray", `${current.f * length} ${length}`);
+      const p = path.current?.getPointAtLength(current.f * length);
+      const behind = path.current?.getPointAtLength(Math.max(0, current.f * length - 2));
+      const ahead = path.current?.getPointAtLength(Math.min(length, current.f * length + 2));
+      if (p && ahead && behind) arrow.current?.setAttribute("transform", `translate(${p.x} ${p.y}) rotate(${Math.atan2(ahead.y - behind.y, ahead.x - behind.x) * 180 / Math.PI})`);
+      if (Object.keys(target).some(k => Math.abs(current[k as keyof typeof current] - target[k as keyof typeof target]) > .0001)) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [fraction, target.x, target.y, target.w, target.h, length]);
+
+  const select = (index: number) => {
+    if (!started) return;
+    if (compact) { setProgress(index); return; }
+    const el = wrap.current; if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY + index / N * (el.offsetHeight - window.innerHeight);
+    window.scrollTo({ top, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+  };
+  const start = () => { setProgress(0); setUserZoom(1); setStarted(true); requestAnimationFrame(() => wrap.current?.scrollIntoView({ behavior: "smooth", block: "start" })); };
+  const close = () => { setStarted(false); setProgress(0); setUserZoom(1); requestAnimationFrame(() => wrap.current?.scrollIntoView({ behavior: "instant", block: "start" })); };
+  const map = <svg ref={svg} viewBox={`0 0 ${VW} ${VH}`} preserveAspectRatio="xMidYMid meet" className="h-full w-full" role="img" aria-label="Illustrated heart-shaped journey through Mumbai">
+    <CityMap />
+    <path ref={path} d={HEART} fill="none" stroke="var(--map-route)" strokeOpacity={started ? .28 : .65} strokeWidth="3" strokeDasharray={started ? "3 7" : undefined} />
+    <path ref={drawn} d={HEART} fill="none" stroke="var(--map-route)" strokeWidth="3.5" strokeLinecap="round" strokeDasharray={`0 ${length}`} />
+    {length > 0 && stops.map((st, i) => { const p = point(routeFraction(i, N)); const on = started && !end && i === active; return <g key={st.id} transform={`translate(${p.x} ${p.y})`}>
+      <path d="M0 0C-14 -16 -14 -37 0 -37C14 -37 14 -16 0 0Z" fill={st.color} stroke="var(--paper)" strokeWidth={on ? 4 : 2} />
+      <circle cy="-24" r="9" fill="var(--paper)" /><text y="-20" textAnchor="middle" fontSize="10" fill="var(--foreground)">{st.badge}</text>
+      {(on || !started || end) && <g transform={`translate(${p.x > CX ? 16 : -16} -24)`}><text textAnchor={p.x > CX ? "start" : "end"} fontSize="12" fontWeight="600" stroke="var(--paper)" strokeWidth="5" paintOrder="stroke" fill="var(--foreground)">{st.label}</text></g>}
+    </g>; })}
+    <g ref={arrow} opacity={started ? 1 : 0}><circle r="14" fill="var(--paper)" stroke="var(--map-route)" strokeWidth="1" /><path d="M10 0L-8 -7L-4 0L-8 7Z" fill="var(--map-route)" /></g>
+  </svg>;
+  if (!stop) return null;
+
+  return <section id="journey" ref={wrap} data-started={started} className={`relative border-t border-border bg-background ${started && !compact ? "journey-scroll" : ""}`}>
+    {!started ? <div className="mx-auto max-w-5xl px-5 py-16 text-center md:py-20">
+      <p className="font-mono text-xs uppercase text-muted-foreground">The journey</p>
+      <h2 className="mt-4 text-4xl font-extrabold leading-tight md:text-6xl">Engineer by degree,<br />builder by <em className="font-serif font-normal">obsession.</em></h2>
+      <p className="mt-4 text-sm text-muted-foreground">{N} chapters of curiosity, code, and building in the real world.</p>
+      <div className="journey-preview mx-auto mt-7 aspect-[1000/780] w-full max-w-[560px] overflow-hidden">{map}</div>
+      <Button onClick={start} size="lg" className="relative mt-3 h-12 shadow-polaroid"><MapIcon />View my journey map</Button>
+    </div> : <div className={compact ? "mx-auto max-w-3xl px-4 pb-16 pt-20" : "sticky top-0 flex h-dvh flex-col px-10 pb-16 pt-24"}>
+      <div className={`flex items-center justify-between gap-3 border-b border-border bg-background pb-3 ${compact ? "sticky top-16 z-20" : ""}`}><p className="font-mono text-xs text-muted-foreground">THE JOURNEY · {end ? "Full circle" : `${String(active + 1).padStart(2, "0")} / ${String(N).padStart(2, "0")}`}</p><Button variant="ghost" size="icon" onClick={close} aria-label="Close journey" title="Close journey"><X /></Button></div>
+      <div className={compact ? "" : "grid min-h-0 flex-1 grid-cols-[minmax(260px,360px)_minmax(0,1fr)] items-center gap-8"}>
+        <div className={compact ? "relative mt-4 aspect-[1000/780] overflow-hidden rounded-lg border border-border" : "relative order-2 h-full max-h-[760px] w-full min-h-0 overflow-hidden"}>{map}
+          <div className="absolute bottom-3 right-3 flex gap-1 rounded-md border border-border bg-card p-1"><Button variant="ghost" size="icon" onClick={() => setUserZoom(z => clamp(z / 1.15, .85, 1.5))} aria-label="Zoom out" title="Zoom out"><Minus /></Button><Button variant="ghost" size="icon" onClick={() => setUserZoom(z => clamp(z * 1.15, .85, 1.5))} aria-label="Zoom in" title="Zoom in"><Plus /></Button><Button variant="ghost" size="icon" onClick={() => setUserZoom(1)} aria-label="Reset map zoom" title="Reset map zoom"><RotateCcw /></Button></div>
+        </div>
+        <div className="min-w-0">{end ? <div className="py-8"><p className="font-mono text-xs text-signal">THE NEXT CHAPTER</p><h3 className="mt-4 text-3xl font-bold">A milestone,<br />not a finish line.</h3><p className="mt-4 text-sm leading-relaxed text-muted-foreground">More AI, robotics, and software to build. The heart is full; the journey continues.</p><Button variant="outline" onClick={() => select(0)} className="mt-6"><RotateCcw />Replay journey</Button></div> : <StoryCard stop={stop} index={active} />}</div>
+      </div>
+      <nav aria-label="Journey stops" className="relative z-10 flex shrink-0 items-center justify-between gap-2 border-t border-border bg-background pt-4">
+        <Button variant="outline" size="icon" onClick={() => select(Math.max(0, (end ? N : active) - 1))} disabled={progress <= .01} aria-label="Previous stop" title="Previous stop"><ArrowLeft /></Button>
+        <div className="flex min-w-0 flex-wrap justify-center gap-1">{stops.map((st, i) => <Button key={st.id} variant={i === active && !end ? "default" : "ghost"} size="icon" className="h-9 w-8" onClick={() => select(i)} aria-label={`Go to ${st.label}`} aria-current={i === active && !end ? "step" : undefined} title={st.label}>{i + 1}</Button>)}</div>
+        <Button variant="outline" size="icon" onClick={() => select(Math.min(N, active + 1))} disabled={end} aria-label="Next stop" title="Next stop"><ArrowRight /></Button>
+      </nav>
+    </div>}
+  </section>;
 }

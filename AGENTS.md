@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep journey motion calculations in a browser-safe helper and animate SVG path distance and camera together; this prevents arrow jumps and permits focused behavioral tests.
+- The journey uses opt-in desktop scroll storytelling and compact touch navigation below the map; this avoids trapping phone visitors in a long pinned section.
