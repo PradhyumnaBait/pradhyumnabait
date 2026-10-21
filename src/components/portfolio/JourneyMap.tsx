@@ -158,9 +158,9 @@ export function JourneyMap() {
         <div className="min-w-0">{end ? <div className="py-8"><p className="font-mono text-xs text-signal">THE NEXT CHAPTER</p><h3 className="mt-4 text-3xl font-bold">A milestone,<br />not a finish line.</h3><p className="mt-4 text-sm leading-relaxed text-muted-foreground">More AI, robotics, and software to build. The heart is full; the journey continues.</p><Button variant="outline" onClick={() => select(0)} className="mt-6"><RotateCcw />Replay journey</Button></div> : <StoryCard stop={stop} index={active} />}</div>
       </div>
       <nav aria-label="Journey stops" className="relative z-10 flex shrink-0 items-center justify-between gap-2 border-t border-border bg-background pt-4">
-        <Button variant="outline" size="icon" onClick={() => select(Math.max(0, Math.ceil(progress) - 1))} disabled={progress <= .01} aria-label="Previous stop" title="Previous stop"><ArrowLeft /></Button>
+        <Button variant="outline" size="icon" onClick={() => select(Math.max(0, (end ? N : active) - 1))} disabled={progress <= .01} aria-label="Previous stop" title="Previous stop"><ArrowLeft /></Button>
         <div className="flex min-w-0 flex-wrap justify-center gap-1">{stops.map((st, i) => <Button key={st.id} variant={i === active && !end ? "default" : "ghost"} size="icon" className="h-9 w-8" onClick={() => select(i)} aria-label={`Go to ${st.label}`} aria-current={i === active && !end ? "step" : undefined} title={st.label}>{i + 1}</Button>)}</div>
-        <Button variant="outline" size="icon" onClick={() => select(Math.min(N, Math.floor(progress) + 1))} disabled={end} aria-label="Next stop" title="Next stop"><ArrowRight /></Button>
+        <Button variant="outline" size="icon" onClick={() => select(Math.min(N, active + 1))} disabled={end} aria-label="Next stop" title="Next stop"><ArrowRight /></Button>
       </nav>
     </div>}
   </section>;
