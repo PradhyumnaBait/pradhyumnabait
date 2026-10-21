@@ -119,7 +119,7 @@ export function Controller() {
   );
   return (
     <button type="button" aria-label="Controller: make the drone do a stunt" data-hover onClick={triggerStunt}
-      className="absolute right-4 top-20 z-20 w-[90px] cursor-pointer transition-transform hover:-translate-y-1 active:scale-95 md:left-6 md:right-auto md:top-auto md:bottom-40 md:w-[160px]">
+      className="absolute right-4 top-20 z-20 w-[90px] cursor-pointer transition-transform hover:-translate-y-1 active:scale-95 md:left-[42%] md:right-auto md:top-auto md:bottom-10 md:w-[150px]">
       <svg viewBox="0 0 200 140" className="w-full overflow-visible drop-shadow-xl">
         {/* antenna + radio rings */}
         <line x1="150" y1="58" x2="154" y2="10" stroke="var(--drone-dome)" strokeWidth="5" strokeLinecap="round" />
