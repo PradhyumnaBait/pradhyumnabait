@@ -174,9 +174,9 @@ export function Toolkit() {
               onMouseEnter={(e) => { if (window.matchMedia("(hover: hover)").matches) setActive(d.id); void e; }}
               onClick={() => (window.matchMedia("(hover: hover)").matches ? setActive(d.id) : select(d.id))}
               aria-pressed={on}
-              className={`flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-2xl border p-2 transition-all duration-300 active:scale-95 ${on ? "-translate-y-1 border-signal bg-card shadow-polaroid" : "border-border bg-card/50"}`}
+              className={`group flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-2xl border p-2 backdrop-blur transition-all duration-300 ease-out active:scale-95 ${on ? "-translate-y-1 border-signal bg-card shadow-polaroid" : "border-border bg-card/50 hover:border-signal/40"}`}
             >
-              <span className={`grid h-9 w-9 place-items-center rounded-xl transition-colors ${on ? "bg-signal text-accent-foreground" : "bg-muted text-foreground"}`}><I className="h-4 w-4" /></span>
+              <span className={`grid h-9 w-9 place-items-center rounded-xl transition-all duration-300 ${on ? "scale-110 rotate-[-6deg] bg-signal text-accent-foreground" : "bg-muted text-foreground"}`}><I className="h-4 w-4" /></span>
               <span className="font-mono text-[10px] leading-tight text-muted-foreground">{d.skill}</span>
             </button>
           );
@@ -313,9 +313,12 @@ export function Skills() {
                     aria-pressed={on}
                     onClick={() => setOpen(on ? null : cat)}
                     onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setOpen(on ? null : cat)}
+                    onPointerMove={(e) => { const r = e.currentTarget.getBoundingClientRect(); e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`); e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`); }}
                     className={`group relative flex h-full cursor-pointer select-none flex-col justify-between overflow-hidden rounded-3xl border p-4 shadow-polaroid transition-all duration-500 active:scale-[0.98] md:p-6 ${on ? "border-signal" : "border-border"} ${big ? "bg-ink text-ink-foreground" : "bg-card hover:bg-paper data-[on=true]:bg-paper"}`}
                   >
                     <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100 group-data-[on=true]:opacity-100" style={{ background: "var(--gradient-glow)" }} />
+                    <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ background: "radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), color-mix(in oklab, var(--signal) 18%, transparent), transparent 70%)" }} />
+                    <div className="pointer-events-none absolute inset-x-6 bottom-0 h-0.5 origin-left scale-x-0 rounded-full bg-signal transition-transform duration-500 group-hover:scale-x-100 group-data-[on=true]:scale-x-100" />
                     <img
                       src={icons[cat]}
                       alt=""
