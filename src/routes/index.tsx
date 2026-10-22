@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Nav, Hero, Toolkit, Manifesto, Work, Skills, Ask } from "@/components/portfolio/sections";
+import { Nav, Hero, Toolkit, Manifesto, Work, Skills } from "@/components/portfolio/sections";
+import { Ask } from "@/components/portfolio/AskOS";
 import { Cursor, ScrollMeter, SoundToggle, StatusWidget } from "@/components/portfolio/fx";
 import { Loader } from "@/components/portfolio/Loader";
 import { JourneyMap } from "@/components/portfolio/JourneyMap";
