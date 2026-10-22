@@ -211,75 +211,66 @@ export function Manifesto() {
 
 export function Work() {
   const previews: Record<string, string> = { moksha: pvMoksha, meddesk: pvMeddesk, trinetra: pvTrinetra };
-  const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null);
-  const [openId, setOpenId] = useState<string | null>(null);
   return (
-    <section id="work" className="relative bg-ink px-4 pb-24 pt-10 text-ink-foreground md:px-6 md:pb-32">
-      <div
-        className="pointer-events-none fixed left-0 top-0 z-30 hidden w-72 overflow-hidden rounded-2xl border border-ink-foreground/20 shadow-float transition-[opacity,scale] duration-300 lg:block"
-        style={{ opacity: hover ? 1 : 0, scale: hover ? "1" : "0.6", transform: `translate(${(hover?.x ?? 0) + 24}px, ${(hover?.y ?? 0) + 24}px) rotate(-4deg)` }}
-      >
-        {Object.entries(previews).map(([id, src]) => (
-          <img key={id} src={src} alt={`${id} preview`} width={976} height={688} loading="lazy" className={`aspect-[976/688] w-full object-cover ${hover?.id === id ? "block" : "hidden"}`} />
-        ))}
-      </div>
+    <section id="work" className="relative px-4 py-24 md:px-6 md:py-32">
       <div className="mx-auto max-w-7xl">
-        <Reveal className="mb-16 flex items-end justify-between">
+        <Reveal className="mb-14 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-8 md:mb-20">
           <div className="flex items-center gap-4">
             <h2 className="text-5xl font-bold tracking-tight md:text-7xl">selected <em className="font-serif font-normal">work</em></h2>
-            <FloatIcon src={icRocket} alt="rocket" className="w-20 md:w-28" />
+            <FloatIcon src={icRocket} alt="rocket" className="w-16 md:w-24" />
           </div>
-          <span className="font-mono text-xs text-ink-muted">03 projects · more soon</span>
+          <span className="font-hand text-2xl text-muted-foreground">things I've shipped ↓</span>
         </Reveal>
-        <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
+        <div className="space-y-20 md:space-y-32">
           {projects.map((pr, i) => {
-            const open = openId === pr.id;
+            const flip = i % 2 === 1;
             return (
-            <Reveal key={pr.id} delay={i * 120}>
-              <Tilt max={10} className="h-full rounded-3xl">
-                <article
-                  data-hover
-                  data-on={open}
-                  onMouseMove={(e) => setHover({ id: pr.id, x: e.clientX, y: e.clientY })}
-                  onMouseLeave={() => setHover(null)}
-                  className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border bg-ink-foreground/[0.04] p-5 shadow-float transition-colors md:p-7 ${open ? "border-signal/60" : "border-ink-foreground/10"}`}
-                >
-                  <div className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100 group-data-[on=true]:opacity-100" style={{ background: "var(--gradient-glow)" }} />
-                  <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-widest text-ink-muted" style={{ transform: "translateZ(20px)" }}>
-                    <span>0{i + 1}</span><span>{pr.kind}</span>
+              <Reveal key={pr.id} className="grid items-center gap-8 md:grid-cols-12 md:gap-12">
+                <div className={`md:col-span-7 ${flip ? "md:order-2" : ""}`}>
+                  <Tilt max={6} className="rounded-2xl">
+                    <a href={profile.github} target="_blank" rel="noreferrer" data-hover aria-label={`${pr.name} on GitHub`}
+                      className="group relative block rounded-2xl bg-paper p-3 pb-12 shadow-polaroid transition-transform duration-500 md:p-4 md:pb-14"
+                      style={{ rotate: flip ? "1.5deg" : "-1.5deg" }}>
+                      <span className="absolute -top-3 left-1/2 h-6 w-24 -translate-x-1/2 rotate-2 rounded-sm bg-signal/25 backdrop-blur-sm" />
+                      <div className="overflow-hidden rounded-xl">
+                        <img src={previews[pr.id]} alt={`${pr.name} preview`} width={976} height={688} loading="lazy"
+                          className="aspect-[16/10] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
+                      </div>
+                      <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between md:bottom-4">
+                        <span className="font-hand text-xl text-muted-foreground">{pr.name.toLowerCase()} · {pr.kind.toLowerCase()}</span>
+                        <span className="grid h-8 w-8 place-items-center rounded-full bg-ink text-ink-foreground transition-transform duration-300 group-hover:rotate-45"><ArrowUpRight className="h-4 w-4" /></span>
+                      </div>
+                    </a>
+                  </Tilt>
+                </div>
+                <div className={`md:col-span-5 ${flip ? "md:order-1" : ""}`}>
+                  <div className="flex items-baseline gap-4">
+                    <span className="font-serif text-6xl italic text-signal md:text-7xl">0{i + 1}</span>
+                    <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">{pr.kind}</span>
                   </div>
-                  <button type="button" onClick={() => setOpenId(open ? null : pr.id)} className="relative mt-5 overflow-hidden rounded-2xl lg:hidden" aria-label={`${pr.name} details`}>
-                    <img src={previews[pr.id]} alt={`${pr.name} preview`} width={976} height={688} loading="lazy" className={`aspect-video w-full object-cover transition-transform duration-700 ${open ? "scale-105" : ""}`} />
-                    <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-ink/80 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-ink-foreground backdrop-blur">
-                      <Plus className={`h-3 w-3 transition-transform ${open ? "rotate-45" : ""}`} /> {open ? "less" : "tap for details"}
-                    </span>
-                  </button>
-                  <h3 className="mt-6 text-3xl font-extrabold tracking-tight md:text-4xl lg:mt-10" style={{ transform: "translateZ(50px)" }}>{pr.name}</h3>
-                  <p className="font-serif text-xl italic text-ink-muted md:text-2xl" style={{ transform: "translateZ(40px)" }}>{pr.tagline}</p>
-                  <div className="my-6 grid grid-cols-2 gap-3 md:my-8 md:gap-4" style={{ transform: "translateZ(60px)" }}>
+                  <h3 className="mt-3 text-4xl font-extrabold tracking-tight md:text-5xl">{pr.name}</h3>
+                  <p className="mt-1 font-serif text-xl italic text-muted-foreground md:text-2xl">{pr.tagline}</p>
+                  <div className="mt-6 flex gap-8 border-y border-border py-4">
                     {[pr.stat, pr.stat2].map((s) => (
-                      <div key={s.label} className="rounded-2xl border border-ink-foreground/10 p-3 md:p-4">
-                        <div className="text-xl font-bold text-signal md:text-2xl">{s.value}</div>
-                        <div className="mt-1 text-xs text-ink-muted">{s.label}</div>
+                      <div key={s.label}>
+                        <div className="text-2xl font-bold md:text-3xl">{s.value}</div>
+                        <div className="text-xs text-muted-foreground">{s.label}</div>
                       </div>
                     ))}
                   </div>
-                  <div className={`grid transition-[grid-template-rows] duration-500 lg:grid-rows-[1fr] ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
-                    <ul className="space-y-2 overflow-hidden text-sm text-ink-foreground/80">
-                      {pr.points.map((pt) => <li key={pt} className="flex gap-2"><span className="text-signal">→</span>{pt}</li>)}
-                    </ul>
+                  <ul className="mt-5 space-y-2 text-sm text-foreground/80">
+                    {pr.points.map((pt) => <li key={pt} className="flex gap-2"><span className="text-signal">→</span>{pt}</li>)}
+                  </ul>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {pr.stack.map((s) => <span key={s} className="rounded-full border border-border bg-card px-3 py-1 font-mono text-[11px]">{s}</span>)}
                   </div>
-                  <div className="mt-auto flex flex-wrap gap-2 pt-8">
-                    {pr.stack.map((s) => <span key={s} className="rounded-full border border-ink-foreground/15 px-3 py-1 font-mono text-[11px]">{s}</span>)}
-                  </div>
-                  <Magnetic className="mt-6 self-start">
-                    <a href={profile.github} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-full bg-signal px-5 py-2.5 text-sm font-medium text-accent-foreground transition-transform hover:scale-105">
-                      view case study <ArrowUpRight className="h-4 w-4 transition-transform group-hover:rotate-45" />
+                  <Magnetic className="mt-7 inline-block">
+                    <a href={profile.github} target="_blank" rel="noreferrer" className="group/b flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-ink-foreground transition-colors hover:bg-signal">
+                      view case study <ArrowUpRight className="h-4 w-4 transition-transform group-hover/b:rotate-45" />
                     </a>
                   </Magnetic>
-                </article>
-              </Tilt>
-            </Reveal>
+                </div>
+              </Reveal>
             );
           })}
         </div>
