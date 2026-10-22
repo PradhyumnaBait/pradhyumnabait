@@ -87,7 +87,7 @@ export function Loader() {
       <svg viewBox="0 0 1000 340" className="mx-auto w-full max-w-6xl overflow-visible">
         <defs>
           <clipPath id="pb-fill">
-            <rect x="0" y="0" height="340" width={95 + fill * 820} />
+            <rect x="0" y="0" height="340" width={200 + fill * 720} />
           </clipPath>
         </defs>
         <g stroke="var(--paper)" fill="none" strokeWidth="1" opacity={guides} vectorEffect="non-scaling-stroke">
@@ -107,14 +107,14 @@ export function Loader() {
         </g>
 
         {/* traced outline */}
-        <text x="95" y="230" textLength="760" lengthAdjust="spacingAndGlyphs" fontFamily="var(--font-sans)" fontWeight="800" fontSize="190" letterSpacing="-6"
+        <text x="200" y="230" textLength="665" lengthAdjust="spacingAndGlyphs" fontFamily="var(--font-sans)" fontWeight="800" fontSize="190" letterSpacing="-6"
           fill="none" stroke="var(--paper)" strokeWidth="1.4" pathLength={1}
           style={{ strokeDasharray: 1200, strokeDashoffset: 1200 * (1 - trace), opacity: trace > 0 ? 1 - fill * 0.6 : 0 }}>
           pradhyumna
         </text>
         {/* filled sweep */}
         <g clipPath="url(#pb-fill)">
-          <text x="95" y="230" textLength="760" lengthAdjust="spacingAndGlyphs" fontFamily="var(--font-sans)" fontWeight="800" fontSize="190" letterSpacing="-6" fill="var(--paper)">
+          <text x="200" y="230" textLength="665" lengthAdjust="spacingAndGlyphs" fontFamily="var(--font-sans)" fontWeight="800" fontSize="190" letterSpacing="-6" fill="var(--paper)">
             pradhyumna
           </text>
         </g>
