@@ -28,29 +28,37 @@ export function Loader() {
   const [p, setP] = useState(0);
   const [phase, setPhase] = useState<"run" | "exit" | "gone">("run");
 
+  const [reduced, setReduced] = useState(false);
+  const [mobile, setMobile] = useState(false);
+
   useEffect(() => {
-    if (sessionStorage.getItem("pb-loaded") || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setPhase("gone");
-      return;
-    }
+    if (sessionStorage.getItem("pb-loaded")) { setPhase("gone"); return; }
+    const rm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setReduced(rm);
+    setMobile(window.innerWidth < 640);
     document.documentElement.style.overflow = "hidden";
     let raf = 0;
     let t0: number | null = null;
     let timer: ReturnType<typeof setTimeout>;
-    const loop = (now: number) => {
-      if (t0 == null) t0 = now;
-      const v = Math.min(1, (now - t0) / DURATION);
-      setP(v);
-      if (v < 1) raf = requestAnimationFrame(loop);
-      else
-        timer = setTimeout(() => {
-          setPhase("exit");
-          sessionStorage.setItem("pb-loaded", "1");
-          document.documentElement.style.overflow = "";
-          timer = setTimeout(() => setPhase("gone"), 1000);
-        }, 450);
+    const finish = (hold: number, out: number) => {
+      timer = setTimeout(() => {
+        setPhase("exit");
+        sessionStorage.setItem("pb-loaded", "1");
+        document.documentElement.style.overflow = "";
+        timer = setTimeout(() => setPhase("gone"), out);
+      }, hold);
     };
-    raf = requestAnimationFrame(loop);
+    if (rm) { setP(1); finish(700, 400); }
+    else {
+      const loop = (now: number) => {
+        if (t0 == null) t0 = now;
+        const v = Math.min(1, (now - t0) / DURATION);
+        setP(v);
+        if (v < 1) raf = requestAnimationFrame(loop);
+        else finish(450, 1000);
+      };
+      raf = requestAnimationFrame(loop);
+    }
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(timer);
@@ -66,12 +74,15 @@ export function Loader() {
   const ring = seg(p, 0.86, 0.94);
   const dot = seg(p, 0.92, 1);
   const guides = 1 - seg(p, 0.9, 1) * 0.55;
+  const exit = phase === "exit";
 
   return (
     <div
       aria-hidden
-      className="grain fixed inset-0 z-[100] flex flex-col justify-between overflow-hidden bg-signal px-5 py-5 text-paper md:px-10 md:py-8"
-      style={{ transform: phase === "exit" ? "translateY(-100%)" : "none", transition: "transform 1s cubic-bezier(.76,0,.24,1)" }}
+      className="grain fixed inset-0 z-[100] flex flex-col justify-between overflow-hidden bg-signal px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] text-paper md:px-10 md:py-8"
+      style={reduced
+        ? { opacity: exit ? 0 : 1, transition: "opacity .4s linear" }
+        : { transform: exit ? "translate3d(0,-100%,0)" : "none", transition: "transform 1s cubic-bezier(.76,0,.24,1)", willChange: "transform" }}
     >
       <div className="flex justify-between gap-6 font-mono text-[9px] uppercase leading-relaxed tracking-[0.3em] md:text-[10px]" style={{ opacity: seg(p, 0, 0.08) }}>
         <div>
