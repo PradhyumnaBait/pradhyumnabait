@@ -95,7 +95,7 @@ export function Loader() {
         </div>
       </div>
 
-      <svg viewBox="0 0 1000 340" className="mx-auto w-full max-w-6xl overflow-visible">
+      <svg viewBox={mobile ? "130 30 800 290" : "0 0 1000 340"} className="mx-auto w-[112%] max-w-6xl -translate-x-[5%] overflow-visible sm:w-full sm:translate-x-0">
         <defs>
           <clipPath id="pb-fill">
             <rect x="0" y="0" height="340" width={200 + fill * 720} />
@@ -111,9 +111,9 @@ export function Loader() {
             <circle key={i} cx={x} cy={y} r={4 * seg(p, 0.3 + i * 0.03, 0.38 + i * 0.03)} fill="var(--paper)" stroke="none" />
           ))}
         </g>
-        <g fontFamily="var(--font-mono)" fontSize="11" letterSpacing="3" fill="var(--paper)" opacity={guides}>
+        <g fontFamily="var(--font-mono)" fontSize={mobile ? 16 : 11} letterSpacing="3" fill="var(--paper)" opacity={guides}>
           {LABELS.map((l) => (
-            <text key={l.t} x="60" y={l.y} opacity={seg(p, l.a, l.a + 0.08)}>{l.t}</text>
+            <text key={l.t} x={mobile ? 135 : 60} y={l.y} opacity={seg(p, l.a, l.a + 0.08)}>{l.t}</text>
           ))}
         </g>
 
@@ -135,7 +135,7 @@ export function Loader() {
       </svg>
 
       <div className="flex items-end justify-between gap-6">
-        <div className="font-sans text-6xl font-extrabold tabular-nums leading-none tracking-tighter md:text-8xl">
+        <div className="font-sans text-[clamp(3.5rem,18vw,4.5rem)] font-extrabold tabular-nums md:text-8xl leading-none tracking-tighter md:text-8xl">
           {String(pct).padStart(3, "0")}%
         </div>
         <div className="max-w-[12rem] text-right font-mono text-[9px] uppercase leading-relaxed tracking-[0.3em] md:max-w-none md:text-[10px]" style={{ opacity: seg(p, 0, 0.08) }}>
