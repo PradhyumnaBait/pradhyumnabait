@@ -88,7 +88,7 @@ function AboutPane() {
   const facts = [["based in", profile.location], ["studying", "B.E. CSE (AI & ML) · VCET"], ["graduating", "2029"], ["into", "AI · backends · robotics"]];
   return (
     <div className="grid h-full gap-6 overflow-y-auto p-5 md:grid-cols-[14rem_1fr] md:p-8">
-      <div className="mx-auto w-48 rotate-[-3deg] bg-paper p-2 pb-8 shadow-polaroid transition-transform duration-500 hover:rotate-0 md:w-full">
+      <div className="mx-auto h-fit w-48 self-start rotate-[-3deg] bg-paper p-2 pb-8 shadow-polaroid transition-transform duration-500 hover:rotate-0 md:w-full">
         <img src={p1} alt="Pradhyumna" loading="lazy" className="aspect-square w-full object-cover" />
         <div className="mt-2 text-center font-hand text-lg">that's me 👋</div>
       </div>
