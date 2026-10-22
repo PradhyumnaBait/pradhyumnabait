@@ -219,7 +219,7 @@ export function Ask() {
             <div className="flex items-center gap-3 bg-ink px-3 py-2.5">
               <div className="group/l flex shrink-0 gap-1.5">
                 {([["open", "close"], ["min", "minimise"], ["max", "maximise"]] as const).map(([s, l], i) => (
-                  <button key={s} aria-label={l} onClick={() => setState(state === s || s === "open" ? "open" : s)} className={`grid h-3 w-3 place-items-center rounded-full text-[8px] leading-none text-ink transition-colors ${["bg-signal", "bg-pin-4", "bg-pin-3"][i]}`}>
+                  <button key={s} aria-label={l} onClick={() => setState(state === s || s === "open" ? "open" : s)} className={`grid h-3 w-3 place-items-center rounded-full text-[8px] leading-none text-ink transition-colors `} style={{ background: ["var(--signal)", "var(--pin-6)", "var(--pin-1)"][i] }}>
                     <span className="opacity-0 group-hover/l:opacity-100">{["×", "–", "+"][i]}</span>
                   </button>
                 ))}
@@ -238,7 +238,7 @@ export function Ask() {
               <span className="hidden shrink-0 font-mono text-[10px] text-ink-muted sm:block">{clock}</span>
             </div>
             <div className="flex items-center gap-2 border-b border-border px-4 py-2 font-mono text-xs text-muted-foreground">
-              <span className="h-1.5 w-1.5 rounded-full bg-pin-3" />pradhyumna.os/<span className="text-foreground">{url}</span>
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--pin-1)" }} />pradhyumna.os/<span className="text-foreground">{url}</span>
             </div>
             <div className={`grid transition-all duration-500 ease-out ${state === "min" ? "grid-rows-[0fr]" : "grid-rows-[1fr]"}`}>
               <div className="overflow-hidden">
