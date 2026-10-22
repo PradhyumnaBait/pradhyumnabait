@@ -84,7 +84,7 @@ export function Loader() {
         ? { opacity: exit ? 0 : 1, transition: "opacity .4s linear" }
         : { transform: exit ? "translate3d(0,-100%,0)" : "none", transition: "transform 1s cubic-bezier(.76,0,.24,1)", willChange: "transform" }}
     >
-      <div className="flex justify-between gap-6 font-mono text-[9px] uppercase leading-relaxed tracking-[0.3em] md:text-[10px]" style={{ opacity: seg(p, 0, 0.08) }}>
+      <div className="flex justify-between gap-6 font-mono text-[9px] uppercase leading-relaxed tracking-[0.16em] sm:tracking-[0.3em] md:text-[10px]" style={{ opacity: seg(p, 0, 0.08) }}>
         <div>
           <div>Pradhyumna Bait</div>
           <div className="opacity-70">From Mumbai to the machine</div>
@@ -138,7 +138,7 @@ export function Loader() {
         <div className="font-sans text-[clamp(3.5rem,18vw,4.5rem)] font-extrabold tabular-nums leading-none tracking-tighter md:text-8xl">
           {String(pct).padStart(3, "0")}%
         </div>
-        <div className="max-w-[12rem] text-right font-mono text-[9px] uppercase leading-relaxed tracking-[0.3em] md:max-w-none md:text-[10px]" style={{ opacity: seg(p, 0, 0.08) }}>
+        <div className="max-w-[12rem] text-right font-mono text-[9px] uppercase leading-relaxed tracking-[0.16em] sm:tracking-[0.3em] md:max-w-none md:text-[10px]" style={{ opacity: seg(p, 0, 0.08) }}>
           AI/ML Engineer &amp; Software Developer
         </div>
       </div>
