@@ -1,5 +1,5 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { ContactShadows, Environment, Lightformer, PresentationControls, RoundedBox, Html } from "@react-three/drei";
+import { ContactShadows, Environment, Lightformer, PresentationControls, RoundedBox, Html, SoftShadows } from "@react-three/drei";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import * as THREE from "three";
 
@@ -44,6 +44,7 @@ function Item({ id, active, onHover, onSelect, children, position, pin }: {
       onClick={(e) => { e.stopPropagation(); if ((e.nativeEvent as PointerEvent).pointerType === "mouse") onHover(id); else onSelect(id); }}
     >
       {children}
+      <HoverRing on={on} />
       <Html position={[0, pin, 0]} center zIndexRange={[20, 0]}>
         <button
           type="button"
@@ -60,10 +61,28 @@ function Item({ id, active, onHover, onSelect, children, position, pin }: {
   );
 }
 
+function HoverRing({ on }: { on: boolean }) {
+  const m = useRef<THREE.MeshBasicMaterial>(null);
+  const r = useRef<THREE.Mesh>(null);
+  useFrame(({ clock }, d) => {
+    if (!m.current || !r.current) return;
+    const dt = Math.min(d, 0.05);
+    m.current.opacity = damp(m.current.opacity, on ? 0.55 : 0, 8, dt);
+    r.current.scale.setScalar(1 + Math.sin(clock.elapsedTime * 3) * 0.04);
+  });
+  return (
+    <mesh ref={r} position={[0, 0.006, 0]} rotation-x={-Math.PI / 2}>
+      <ringGeometry args={[0.95, 1.05, 64]} />
+      <meshBasicMaterial ref={m} color={CORAL} transparent opacity={0} depthWrite={false} toneMapped={false} />
+    </mesh>
+  );
+}
+
 /* ---------- laptop ---------- */
 const PALETTE = [CORAL, CREAM, "#7fb3a0", "#d9a35a", "#8a8fd6"];
 function drawCode(ctx: CanvasRenderingContext2D, n: number, on: boolean) {
   const W = 512, H = 320;
+  ctx.setTransform(2, 0, 0, 2, 0, 0);
   ctx.fillStyle = "#16171b"; ctx.fillRect(0, 0, W, H);
   ctx.fillStyle = "#1e2026"; ctx.fillRect(0, 0, W, 22);
   ["#e8553f", "#d9a35a", "#7fb3a0"].forEach((c, i) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(14 + i * 14, 11, 4, 0, Math.PI * 2); ctx.fill(); });
@@ -88,7 +107,7 @@ function drawCode(ctx: CanvasRenderingContext2D, n: number, on: boolean) {
 }
 
 function Laptop({ on }: { on: boolean }) {
-  const { tex, ctx } = useMemo(() => canvasTex(512, 320, (c) => drawCode(c, 0, false)), []);
+  const { tex, ctx } = useMemo(() => canvasTex(1024, 640, (c) => drawCode(c, 0, false)), []);
   const keys = useRef<THREE.InstancedMesh>(null);
   const lid = useRef<THREE.Group>(null);
   const acc = useRef(0), n = useRef(0);
@@ -111,7 +130,7 @@ function Laptop({ on }: { on: boolean }) {
   return (
     <group rotation-y={0.12}>
       <RoundedBox args={[2.4, 0.08, 1.6]} radius={0.035} castShadow receiveShadow>
-        <meshStandardMaterial color={ALU} metalness={0.75} roughness={0.28} />
+        <meshPhysicalMaterial color={ALU} metalness={0.85} roughness={0.22} clearcoat={0.4} clearcoatRoughness={0.3} />
       </RoundedBox>
       <mesh position={[0, 0.042, -0.32]}><boxGeometry args={[2.26, 0.005, 0.82]} /><meshStandardMaterial color="#2a2827" roughness={0.8} /></mesh>
       <instancedMesh ref={keys} args={[undefined, undefined, COLS * ROWS]} castShadow>
@@ -121,12 +140,16 @@ function Laptop({ on }: { on: boolean }) {
       <mesh position={[0, 0.042, 0.42]}><boxGeometry args={[0.85, 0.004, 0.48]} /><meshStandardMaterial color="#bdb7af" metalness={0.6} roughness={0.35} /></mesh>
       <group ref={lid} position={[0, 0.04, -0.79]} rotation-x={-0.28}>
         <RoundedBox args={[2.4, 1.55, 0.05]} radius={0.03} position={[0, 0.775, 0]} castShadow>
-          <meshStandardMaterial color={ALU} metalness={0.75} roughness={0.28} />
+          <meshPhysicalMaterial color={ALU} metalness={0.85} roughness={0.22} clearcoat={0.4} clearcoatRoughness={0.3} />
         </RoundedBox>
         <mesh position={[0, 0.79, 0.027]}><planeGeometry args={[2.3, 1.45]} /><meshStandardMaterial color="#0c0c0e" roughness={0.2} /></mesh>
         <mesh position={[0, 0.8, 0.029]}>
           <planeGeometry args={[2.18, 1.34]} />
           <meshBasicMaterial map={tex} toneMapped={false} />
+        </mesh>
+        <mesh position={[0, 0.79, 0.031]}>
+          <planeGeometry args={[2.3, 1.45]} />
+          <meshPhysicalMaterial transparent opacity={0.08} roughness={0.05} clearcoat={1} color="#ffffff" />
         </mesh>
       </group>
     </group>
@@ -144,7 +167,7 @@ function Fan({ on }: { on: boolean }) {
   });
   return (
     <group>
-      <mesh rotation-x={Math.PI / 2}><torusGeometry args={[0.31, 0.025, 8, 40]} /><meshStandardMaterial color="#2c2a2b" metalness={0.6} roughness={0.35} /></mesh>
+      <mesh rotation-x={Math.PI / 2}><torusGeometry args={[0.31, 0.025, 16, 64]} /><meshStandardMaterial color="#2c2a2b" metalness={0.6} roughness={0.35} /></mesh>
       <group ref={r}>
         <mesh><cylinderGeometry args={[0.085, 0.085, 0.05, 24]} /><meshStandardMaterial color="#2c2a2b" metalness={0.5} roughness={0.3} /></mesh>
         {Array.from({ length: 9 }).map((_, i) => (
@@ -166,7 +189,7 @@ function GPU({ on }: { on: boolean }) {
   return (
     <group rotation-y={-0.35}>
       <RoundedBox args={[2.1, 0.32, 0.9]} radius={0.06} castShadow receiveShadow>
-        <meshStandardMaterial color="#2a2829" metalness={0.65} roughness={0.32} />
+        <meshPhysicalMaterial color="#2a2829" metalness={0.7} roughness={0.28} clearcoat={0.6} clearcoatRoughness={0.2} />
       </RoundedBox>
       <mesh position={[0, 0.162, 0]}><boxGeometry args={[1.95, 0.01, 0.78]} /><meshStandardMaterial color="#1a1919" roughness={0.5} /></mesh>
       {[-0.5, 0.5].map((x) => <group key={x} position={[x, 0.18, 0]}><Fan on={on} /></group>)}
@@ -198,9 +221,9 @@ function Mug({ on }: { on: boolean }) {
   });
   return (
     <group>
-      <mesh castShadow receiveShadow><latheGeometry args={[prof, 40]} /><meshStandardMaterial color={CORAL} roughness={0.35} side={THREE.DoubleSide} /></mesh>
-      <mesh position={[0, 0.66, 0]} rotation-x={-Math.PI / 2}><circleGeometry args={[0.3, 32]} /><meshStandardMaterial color="#4a2c1b" roughness={0.15} /></mesh>
-      <mesh position={[0.33, 0.42, 0]} rotation-z={-Math.PI / 2} castShadow><torusGeometry args={[0.18, 0.05, 14, 28, Math.PI]} /><meshStandardMaterial color={CORAL} roughness={0.35} /></mesh>
+      <mesh castShadow receiveShadow><latheGeometry args={[prof, 72]} /><meshPhysicalMaterial color={CORAL} roughness={0.25} clearcoat={1} clearcoatRoughness={0.08} side={THREE.DoubleSide} /></mesh>
+      <mesh position={[0, 0.66, 0]} rotation-x={-Math.PI / 2}><circleGeometry args={[0.3, 32]} /><meshPhysicalMaterial color="#3e2416" roughness={0.05} clearcoat={1} /></mesh>
+      <mesh position={[0.33, 0.42, 0]} rotation-z={-Math.PI / 2} castShadow><torusGeometry args={[0.18, 0.05, 24, 48, Math.PI]} /><meshPhysicalMaterial color={CORAL} roughness={0.25} clearcoat={1} clearcoatRoughness={0.08} /></mesh>
       <group ref={steam}>
         {Array.from({ length: 7 }).map((_, i) => (
           <mesh key={i}><sphereGeometry args={[1, 12, 12]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.2} depthWrite={false} /></mesh>
@@ -228,7 +251,7 @@ function Plant({ on }: { on: boolean }) {
   });
   return (
     <group>
-      <mesh castShadow receiveShadow><latheGeometry args={[prof, 36]} /><meshStandardMaterial color="#ebe5db" roughness={0.75} /></mesh>
+      <mesh castShadow receiveShadow><latheGeometry args={[prof, 64]} /><meshPhysicalMaterial color="#ebe5db" roughness={0.55} clearcoat={0.3} /></mesh>
       <mesh position={[0, 0.56, 0]} rotation-x={-Math.PI / 2}><circleGeometry args={[0.38, 32]} /><meshStandardMaterial color="#3b2a20" roughness={1} /></mesh>
       <group ref={leaves}>
         {L.map(([x, y, z, r, c], i) => (
@@ -258,7 +281,7 @@ function ServerBox({ on }: { on: boolean }) {
   return (
     <group>
       <RoundedBox args={[0.95, 1.45, 0.95]} radius={0.07} position={[0, 0.725, 0]} castShadow receiveShadow>
-        <meshStandardMaterial color="#232124" metalness={0.45} roughness={0.4} />
+        <meshPhysicalMaterial color="#232124" metalness={0.55} roughness={0.32} clearcoat={0.5} />
       </RoundedBox>
       {[0, 1, 2, 3].map((r) => (
         <group key={r} position={[0, 0.28 + r * 0.3, 0.478]}>
@@ -307,9 +330,10 @@ function Books({ on }: { on: boolean }) {
 /* ---------- desk + rig ---------- */
 function Desk() {
   const wood = useMemo(() => {
-    const { tex } = canvasTex(1024, 512, (c) => {
+    const { tex } = canvasTex(2048, 1024, (c) => {
+      c.scale(2, 2);
       c.fillStyle = "#c99a68"; c.fillRect(0, 0, 1024, 512);
-      for (let i = 0; i < 260; i++) {
+      for (let i = 0; i < 420; i++) {
         const y = Math.random() * 512;
         c.strokeStyle = `rgba(${120 + Math.random() * 40},${80 + Math.random() * 30},${45},${0.06 + Math.random() * 0.12})`;
         c.lineWidth = 0.5 + Math.random() * 2.5;
@@ -323,7 +347,7 @@ function Desk() {
   return (
     <group>
       <RoundedBox args={[9, 0.28, 4.6]} radius={0.12} position={[0, -0.14, 0]} receiveShadow castShadow>
-        <meshStandardMaterial map={wood} roughness={0.55} />
+        <meshPhysicalMaterial map={wood} roughness={0.45} clearcoat={0.35} clearcoatRoughness={0.4} />
       </RoundedBox>
       {[[-4, -1.9], [4, -1.9], [-4, 1.9], [4, 1.9]].map(([x, z], i) => (
         <mesh key={i} position={[x!, -1.4, z!]} castShadow><cylinderGeometry args={[0.1, 0.07, 2.3, 16]} /><meshStandardMaterial color="#9b7350" roughness={0.6} /></mesh>
@@ -342,6 +366,20 @@ function Rig() {
     cam.lookAt(0, narrow ? -0.9 : -0.2, 0);
     cam.updateProjectionMatrix();
   }, [size.width, camera]);
+  return null;
+}
+
+function Parallax({ disabled }: { disabled: boolean }) {
+  const { camera, pointer } = useThree();
+  const base = useRef<THREE.Vector3 | null>(null);
+  useFrame((_, d) => {
+    if (disabled) return;
+    if (!base.current) base.current = camera.position.clone();
+    const dt = Math.min(d, 0.05);
+    camera.position.x = damp(camera.position.x, base.current.x + pointer.x * 0.35, 3, dt);
+    camera.position.y = damp(camera.position.y, base.current.y + pointer.y * 0.2, 3, dt);
+    camera.lookAt(0, -0.2, 0);
+  });
   return null;
 }
 
@@ -366,12 +404,14 @@ export default function DeskScene({ active, onHover, onSelect }: { active: strin
     books: { pos: [-3.3, 0, 0.9], pin: 1.1, el: (on) => <Books on={on} /> },
   };
   return (
-    <Canvas shadows dpr={[1, 1.75]} camera={{ position: [0, 5, 8.6], fov: 38 }} onPointerMissed={() => onHover(null)} style={{ touchAction: "pan-y" }}>
+    <Canvas shadows dpr={[1.25, 2]} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.05 }} camera={{ position: [0, 5, 8.6], fov: 38 }} onPointerMissed={() => onHover(null)} style={{ touchAction: "pan-y" }}>
       <Rig />
+      <SoftShadows size={22} samples={12} focus={0.6} />
+      <Parallax disabled={touch} />
       <ambientLight intensity={0.45} />
-      <directionalLight position={[-4, 8, 5]} intensity={1.8} color="#fff1e2" castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-6} shadow-camera-right={6} shadow-camera-top={6} shadow-camera-bottom={-6} shadow-bias={-0.0004} />
+      <directionalLight position={[-4, 8, 5]} intensity={1.8} color="#fff1e2" castShadow shadow-mapSize={[2048, 2048]} shadow-camera-left={-6} shadow-camera-right={6} shadow-camera-top={6} shadow-camera-bottom={-6} shadow-bias={-0.0004} />
       <pointLight position={[2.8, 1.2, 2]} intensity={active === "gpu" ? 6 : 1.5} color={CORAL} distance={4} />
-      <Environment resolution={256}>
+      <Environment resolution={512}>
         <Lightformer intensity={2} position={[0, 5, 0]} scale={[10, 10, 1]} rotation-x={Math.PI / 2} />
         <Lightformer intensity={1.4} color="#ffd9c7" position={[-5, 2, 2]} rotation-y={Math.PI / 2} scale={[10, 2, 1]} />
         <Lightformer intensity={0.8} position={[5, 2, -2]} rotation-y={-Math.PI / 2} scale={[10, 2, 1]} />
@@ -386,7 +426,7 @@ export default function DeskScene({ active, onHover, onSelect }: { active: strin
           </group>
         </Sway>
       </PresentationControls>
-      <ContactShadows position={[0, -3.1, 0]} opacity={0.3} scale={16} blur={2.8} far={4} />
+      <ContactShadows position={[0, -3.1, 0]} opacity={0.35} scale={16} blur={2.4} far={4} resolution={1024} />
     </Canvas>
   );
 }
