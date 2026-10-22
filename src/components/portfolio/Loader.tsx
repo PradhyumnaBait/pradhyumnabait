@@ -28,29 +28,37 @@ export function Loader() {
   const [p, setP] = useState(0);
   const [phase, setPhase] = useState<"run" | "exit" | "gone">("run");
 
+  const [reduced, setReduced] = useState(false);
+  const [mobile, setMobile] = useState(false);
+
   useEffect(() => {
-    if (sessionStorage.getItem("pb-loaded") || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setPhase("gone");
-      return;
-    }
+    if (sessionStorage.getItem("pb-loaded")) { setPhase("gone"); return; }
+    const rm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setReduced(rm);
+    setMobile(window.innerWidth < 640);
     document.documentElement.style.overflow = "hidden";
     let raf = 0;
     let t0: number | null = null;
     let timer: ReturnType<typeof setTimeout>;
-    const loop = (now: number) => {
-      if (t0 == null) t0 = now;
-      const v = Math.min(1, (now - t0) / DURATION);
-      setP(v);
-      if (v < 1) raf = requestAnimationFrame(loop);
-      else
-        timer = setTimeout(() => {
-          setPhase("exit");
-          sessionStorage.setItem("pb-loaded", "1");
-          document.documentElement.style.overflow = "";
-          timer = setTimeout(() => setPhase("gone"), 1000);
-        }, 450);
+    const finish = (hold: number, out: number) => {
+      timer = setTimeout(() => {
+        setPhase("exit");
+        sessionStorage.setItem("pb-loaded", "1");
+        document.documentElement.style.overflow = "";
+        timer = setTimeout(() => setPhase("gone"), out);
+      }, hold);
     };
-    raf = requestAnimationFrame(loop);
+    if (rm) { setP(1); finish(700, 400); }
+    else {
+      const loop = (now: number) => {
+        if (t0 == null) t0 = now;
+        const v = Math.min(1, (now - t0) / DURATION);
+        setP(v);
+        if (v < 1) raf = requestAnimationFrame(loop);
+        else finish(450, 1000);
+      };
+      raf = requestAnimationFrame(loop);
+    }
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(timer);
@@ -66,14 +74,17 @@ export function Loader() {
   const ring = seg(p, 0.86, 0.94);
   const dot = seg(p, 0.92, 1);
   const guides = 1 - seg(p, 0.9, 1) * 0.55;
+  const exit = phase === "exit";
 
   return (
     <div
       aria-hidden
-      className="grain fixed inset-0 z-[100] flex flex-col justify-between overflow-hidden bg-signal px-5 py-5 text-paper md:px-10 md:py-8"
-      style={{ transform: phase === "exit" ? "translateY(-100%)" : "none", transition: "transform 1s cubic-bezier(.76,0,.24,1)" }}
+      className="grain fixed inset-0 z-[100] flex flex-col justify-between overflow-hidden bg-signal px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] text-paper md:px-10 md:py-8"
+      style={reduced
+        ? { opacity: exit ? 0 : 1, transition: "opacity .4s linear" }
+        : { transform: exit ? "translate3d(0,-100%,0)" : "none", transition: "transform 1s cubic-bezier(.76,0,.24,1)", willChange: "transform" }}
     >
-      <div className="flex justify-between gap-6 font-mono text-[9px] uppercase leading-relaxed tracking-[0.3em] md:text-[10px]" style={{ opacity: seg(p, 0, 0.08) }}>
+      <div className="flex justify-between gap-6 font-mono text-[9px] uppercase leading-relaxed tracking-[0.16em] sm:tracking-[0.3em] md:text-[10px]" style={{ opacity: seg(p, 0, 0.08) }}>
         <div>
           <div>Pradhyumna Bait</div>
           <div className="opacity-70">From Mumbai to the machine</div>
@@ -84,7 +95,7 @@ export function Loader() {
         </div>
       </div>
 
-      <svg viewBox="0 0 1000 340" className="mx-auto w-full max-w-6xl overflow-visible">
+      <svg viewBox={mobile ? "130 30 800 290" : "0 0 1000 340"} className="mx-auto w-[112%] max-w-6xl -translate-x-[5%] overflow-visible sm:w-full sm:translate-x-0">
         <defs>
           <clipPath id="pb-fill">
             <rect x="0" y="0" height="340" width={200 + fill * 720} />
@@ -100,7 +111,7 @@ export function Loader() {
             <circle key={i} cx={x} cy={y} r={4 * seg(p, 0.3 + i * 0.03, 0.38 + i * 0.03)} fill="var(--paper)" stroke="none" />
           ))}
         </g>
-        <g fontFamily="var(--font-mono)" fontSize="11" letterSpacing="3" fill="var(--paper)" opacity={guides}>
+        <g fontFamily="var(--font-mono)" fontSize="11" letterSpacing="3" fill="var(--paper)" opacity={mobile ? 0 : guides}>
           {LABELS.map((l) => (
             <text key={l.t} x="60" y={l.y} opacity={seg(p, l.a, l.a + 0.08)}>{l.t}</text>
           ))}
@@ -124,10 +135,10 @@ export function Loader() {
       </svg>
 
       <div className="flex items-end justify-between gap-6">
-        <div className="font-sans text-6xl font-extrabold tabular-nums leading-none tracking-tighter md:text-8xl">
+        <div className="font-sans text-[clamp(3.5rem,18vw,4.5rem)] font-extrabold tabular-nums leading-none tracking-tighter md:text-8xl">
           {String(pct).padStart(3, "0")}%
         </div>
-        <div className="max-w-[12rem] text-right font-mono text-[9px] uppercase leading-relaxed tracking-[0.3em] md:max-w-none md:text-[10px]" style={{ opacity: seg(p, 0, 0.08) }}>
+        <div className="max-w-[12rem] text-right font-mono text-[9px] uppercase leading-relaxed tracking-[0.16em] sm:tracking-[0.3em] md:max-w-none md:text-[10px]" style={{ opacity: seg(p, 0, 0.08) }}>
           AI/ML Engineer &amp; Software Developer
         </div>
       </div>
