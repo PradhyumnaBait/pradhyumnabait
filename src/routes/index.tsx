@@ -31,9 +31,9 @@ function Index() {
       <Toolkit />
       <Manifesto />
       <Work />
+      <JourneyMap />
       <Skills />
       <Ask />
-      <JourneyMap />
       <NoteWall />
       <Socials />
       <SoundToggle />
