@@ -5,6 +5,7 @@ import { stops } from "./journey-stops";
 import { Reveal, FloatIcon } from "./fx";
 import icBrain from "@/assets/icons/brain.png";
 import p1 from "@/assets/polaroid-1.jpg";
+import aboutMe from "@/assets/about-me.png.asset.json";
 import ev1 from "@/assets/events/event-1.jpg.asset.json";
 import ev2 from "@/assets/events/event-2.jpg.asset.json";
 import ev4 from "@/assets/events/event-4.jpg.asset.json";
@@ -95,7 +96,7 @@ function AboutPane() {
   return (
     <div className="grid h-full gap-6 overflow-y-auto p-5 md:grid-cols-[14rem_1fr] md:p-8">
       <div className="mx-auto h-fit w-48 self-start rotate-[-3deg] bg-paper p-2 pb-8 shadow-polaroid transition-transform duration-500 hover:rotate-0 md:w-full">
-        <img src={p1} alt="Pradhyumna" loading="lazy" className="aspect-square w-full object-cover" />
+        <img src={aboutMe.url} alt="Pradhyumna holding his Techfest certificate" loading="lazy" className="aspect-square w-full object-cover object-top" />
         <div className="mt-2 text-center font-hand text-lg">that's me 👋</div>
       </div>
       <div>
