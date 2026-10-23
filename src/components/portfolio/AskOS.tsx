@@ -5,6 +5,12 @@ import { stops } from "./journey-stops";
 import { Reveal, FloatIcon } from "./fx";
 import icBrain from "@/assets/icons/brain.png";
 import p1 from "@/assets/polaroid-1.jpg";
+import ev1 from "@/assets/events/event-1.jpg.asset.json";
+import ev2 from "@/assets/events/event-2.jpg.asset.json";
+import ev4 from "@/assets/events/event-4.jpg.asset.json";
+import ev5 from "@/assets/events/event-5.jpg.asset.json";
+import ev6 from "@/assets/events/event-6.jpg.asset.json";
+import ev7 from "@/assets/events/event-7.jpg.asset.json";
 
 type Msg = { from: "me" | "bot"; text: string };
 type Tab = "ask" | "about" | "log" | "hack" | "events";
@@ -183,20 +189,41 @@ function HackPane() {
   );
 }
 
+const EVENTS = [
+  { img: ev4.url, title: "Build And Grow AI Hackathon 2.0", note: "GDG Cloud Mumbai × NMIMS" },
+  { img: ev6.url, title: "Opening keynote", note: "Build And Grow 2.0 · auditorium" },
+  { img: ev1.url, title: "Hackathon floor", note: "laptops out, heads down" },
+  { img: ev2.url, title: "Tech talk night", note: "case study on stage" },
+  { img: ev5.url, title: "Robotics lab", note: "VCET · Vasai, 2026" },
+  { img: ev7.url, title: "Demo time", note: "showing the build" },
+];
+
 function EventsPane() {
+  const [open, setOpen] = useState<number | null>(null);
+  const ev = open === null ? null : EVENTS[open];
   return (
-    <div className="h-full overflow-y-auto p-4 md:p-6">
-      <div className="mb-4 flex items-center gap-2 font-hand text-xl text-muted-foreground"><Sparkles className="h-4 w-4 text-signal" />events I've been to — photo album loading…</div>
+    <div className="relative h-full overflow-y-auto p-4 md:p-6">
+      <div className="mb-4 flex items-center gap-2 font-hand text-xl text-muted-foreground"><Sparkles className="h-4 w-4 text-signal" />events I've been to — tap a photo</div>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="group bg-paper p-2 pb-6 shadow-polaroid transition-all duration-500 hover:z-10 hover:-translate-y-1 hover:rotate-0" style={{ rotate: `${[-3, 2, -1, 3, -2, 1][i]}deg` }}>
-            <div className="grid aspect-[4/3] place-items-center rounded-sm border border-dashed border-border bg-muted/60">
-              <ImagePlus className="h-6 w-6 text-muted-foreground transition-transform group-hover:scale-110" />
+        {EVENTS.map((e, i) => (
+          <button key={e.title} onClick={() => setOpen(i)} className="group bg-paper p-2 pb-3 text-left shadow-polaroid transition-all duration-500 hover:z-10 hover:-translate-y-1 hover:rotate-0" style={{ rotate: `${[-3, 2, -1, 3, -2, 1][i]}deg` }}>
+            <div className="aspect-[4/3] overflow-hidden rounded-sm bg-muted">
+              <img src={e.img} alt={e.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
             </div>
-            <div className="mt-2 text-center font-hand text-base text-muted-foreground">event #{i + 1}</div>
-          </div>
+            <div className="mt-2 truncate text-center font-hand text-base leading-tight">{e.title}</div>
+            <div className="truncate text-center font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{e.note}</div>
+          </button>
         ))}
       </div>
+      {ev && (
+        <button onClick={() => setOpen(null)} aria-label="close photo" className="absolute inset-0 z-20 grid place-items-center bg-ink/80 p-4 animate-rise">
+          <div className="max-w-full bg-paper p-3 pb-4 shadow-float">
+            <img src={ev.img} alt={ev.title} className="max-h-[22rem] w-auto max-w-full object-contain" />
+            <div className="mt-2 text-center font-hand text-xl">{ev.title}</div>
+            <div className="text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{ev.note} · tap to close</div>
+          </div>
+        </button>
+      )}
     </div>
   );
 }
