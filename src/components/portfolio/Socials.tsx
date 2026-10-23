@@ -81,7 +81,7 @@ export function Socials() {
         <p className="mx-auto mt-6 max-w-md text-lg font-medium text-paper drop-shadow">Open to internships, collaborations and AI projects. I reply fast.</p>
 
         <div className="mx-auto mt-14 max-w-3xl rounded-[2rem] border border-border bg-background/95 px-4 pb-8 pt-6 shadow-float backdrop-blur" style={{ backgroundImage: "linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
-          <p className="font-mono text-[11px] text-muted-foreground">psst, these work on your keyboard too: {KEYS.map((k) => <kbd key={k.k} className="mx-0.5 rounded border border-border bg-card px-1.5 py-0.5 text-foreground">{k.k.toUpperCase()}</kbd>)}</p>
+          <p className="font-mono text-[11px] text-muted-foreground"></p>
           <div className="mt-20 flex flex-wrap justify-center gap-x-6 gap-y-16 md:gap-x-10">
             {KEYS.map((d) => <Keycap key={d.k} d={d} pressed={pressed === d.k} onPress={() => press(d.k)} />)}
           </div>

@@ -2,7 +2,7 @@ export const profile = {
   name: "pradhyumna",
   fullName: "Pradhyumna Bait",
   role: "AI/ML Engineer & Software Developer",
-  email: "pradhyumna.bait@gmail.com",
+  email: "pradhyumnabait22@gmail.com",
   phone: "+91 91378 17583",
   linkedin: "https://linkedin.com/in/pradhyumnabait",
   github: "https://github.com/pradhyumnabait",

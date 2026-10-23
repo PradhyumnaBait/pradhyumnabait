@@ -85,7 +85,7 @@ function AskPane() {
 }
 
 function AboutPane() {
-  const facts = [["based in", profile.location], ["studying", "B.E. CSE (AI & ML) · VCET"], ["graduating", "2029"], ["into", "AI · backends · robotics"]];
+  const facts = [["based in", profile.location], ["studying", "B.TECH. CSE (DS) · VCET"], ["graduating", "2029"], ["into", "AI Automation · backends · robotics"]];
   return (
     <div className="grid h-full gap-6 overflow-y-auto p-5 md:grid-cols-[14rem_1fr] md:p-8">
       <div className="mx-auto h-fit w-48 self-start rotate-[-3deg] bg-paper p-2 pb-8 shadow-polaroid transition-transform duration-500 hover:rotate-0 md:w-full">
@@ -96,7 +96,7 @@ function AboutPane() {
         <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">README.md</div>
         <h3 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">hi, I'm {profile.fullName.split(" ")[0]}<span className="text-signal">.</span></h3>
         <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
-          A Computer Science (AI & ML) student who likes the seam where models meet infrastructure. I build <b className="text-foreground">AI products</b>, <b className="text-foreground">fast backends</b> and the occasional <b className="text-foreground">robot</b> — and I'm getting ready to help small businesses automate the boring stuff.
+          A Computer Science Engineering student who likes the seam where models meet infrastructure. I build <b className="text-foreground">AI products</b>, <b className="text-foreground">fast backends</b> and the occasional <b className="text-foreground">robot</b> — and I'm getting ready to help small businesses automate the boring stuff.
         </p>
         <dl className="mt-5 grid grid-cols-2 gap-2">
           {facts.map(([k, v], i) => (
