@@ -192,10 +192,10 @@ function HackPane() {
 const EVENTS = [
   { img: ev4.url, title: "Build And Grow AI Hackathon 2.0", note: "GDG Cloud Mumbai × NMIMS" },
   { img: ev6.url, title: "Opening keynote", note: "Build And Grow 2.0 · auditorium" },
-  { img: ev1.url, title: "Hackathon floor", note: "laptops out, heads down" },
-  { img: ev2.url, title: "Tech talk night", note: "case study on stage" },
-  { img: ev5.url, title: "Robotics lab", note: "VCET · Vasai, 2026" },
-  { img: ev7.url, title: "Demo time", note: "showing the build" },
+  { img: ev1.url, title: "Build with Google Cloud Ai and MongoDB", note: "laptops out, heads down" },
+  { img: ev2.url, title: "Claude Ai Hackathon", note: "case study on stage" },
+  { img: ev5.url, title: "Product Showcase", note: "VCET · Vasai, 2026" },
+  { img: ev7.url, title: "MongoDB Mentor", note: "showing the build" },
 ];
 
 function EventsPane() {
