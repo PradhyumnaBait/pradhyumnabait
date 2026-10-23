@@ -56,7 +56,7 @@ export function Socials() {
       const d = KEYS.find((x) => x.k === e.key.toLowerCase()); if (!d) return;
       const r = sec.current?.getBoundingClientRect(); if (!r || r.top > window.innerHeight || r.bottom < 0) return;
       press(d.k);
-      setTimeout(() => (d.href.startsWith("http") ? window.open(d.href, "_blank") : (window.location.href = d.href)), 200);
+      setTimeout(() => (d.href.startsWith("http") ? window.open(d.href, "_blank", "noopener,noreferrer") : (window.location.href = d.href)), 200);
     };
     const onScroll = () => { const r = sec.current?.getBoundingClientRect(); if (r) setY(r.top); };
     window.addEventListener("keydown", onKey); window.addEventListener("scroll", onScroll, { passive: true });
@@ -90,9 +90,9 @@ export function Socials() {
           </button>
         </div>
 
-        <div className="mt-16 flex items-center justify-between font-mono text-xs text-paper/90">
-          <span>© 2026 {profile.fullName} · {profile.location}</span>
-          <a href="#top" className="flex items-center gap-1 hover:underline">back to top <ArrowUp className="h-3.5 w-3.5" /></a>
+        <div className="mt-16 flex items-center justify-between font-mono text-xs">
+          <span className="font-semibold text-black">© 2026 {profile.fullName} · {profile.location}</span>
+          <a href="#top" className="flex items-center gap-1 text-black font-semibold hover:underline">back to top <ArrowUp className="h-3.5 w-3.5" /></a>
         </div>
       </div>
     </footer>

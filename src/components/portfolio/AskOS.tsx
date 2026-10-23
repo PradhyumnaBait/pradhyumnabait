@@ -207,14 +207,34 @@ const EVENTS = [
 function EventsPane() {
   const [open, setOpen] = useState<number | null>(null);
   const ev = open === null ? null : EVENTS[open];
+
+  useEffect(() => {
+    if (open === null) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   return (
     <div className="relative h-full overflow-y-auto p-4 md:p-6">
-      <div className="mb-4 flex items-center gap-2 font-hand text-xl text-muted-foreground"><Sparkles className="h-4 w-4 text-signal" />events I've been to — tap a photo</div>
+      <div className="mb-4 flex items-center gap-2 font-hand text-xl text-muted-foreground">
+        <Sparkles className="h-4 w-4 text-signal" />events I've been to — tap a photo
+      </div>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         {EVENTS.map((e, i) => (
-          <button key={e.title} onClick={() => setOpen(i)} className="group bg-paper p-2 pb-3 text-left shadow-polaroid transition-all duration-500 hover:z-10 hover:-translate-y-1 hover:rotate-0" style={{ rotate: `${[-3, 2, -1, 3, -2, 1, -2, 2, -1][i % 9]}deg` }}>
+          <button
+            key={e.title}
+            onClick={() => setOpen(i)}
+            className="group bg-paper p-2 pb-3 text-left shadow-polaroid transition-all duration-500 hover:z-10 hover:-translate-y-1 hover:rotate-0"
+            style={{ rotate: `${[-3, 2, -1, 3, -2, 1, -2, 2, -1][i % 9]}deg` }}
+          >
             <div className="aspect-[4/3] overflow-hidden rounded-sm bg-muted">
-              <img src={e.img} alt={e.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <img
+                src={e.img}
+                alt={e.title}
+                loading="lazy"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
             </div>
             <div className="mt-2 truncate text-center font-hand text-base leading-tight">{e.title}</div>
             <div className="truncate text-center font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{e.note}</div>
@@ -222,13 +242,32 @@ function EventsPane() {
         ))}
       </div>
       {ev && (
-        <button onClick={() => setOpen(null)} aria-label="close photo" className="absolute inset-0 z-20 grid place-items-center bg-ink/80 p-4 animate-rise">
-          <div className="max-w-full bg-paper p-3 pb-4 shadow-float">
-            <img src={ev.img} alt={ev.title} className="max-h-[22rem] w-auto max-w-full object-contain" />
-            <div className="mt-2 text-center font-hand text-xl">{ev.title}</div>
-            <div className="text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{ev.note} · tap to close</div>
+        <div
+          onClick={() => setOpen(null)}
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/75 p-4 backdrop-blur-sm animate-in fade-in duration-200"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-h-[85vh] max-w-lg overflow-hidden rounded-2xl bg-paper p-3 pb-5 shadow-float animate-in zoom-in-95 duration-200"
+          >
+            <button
+              onClick={() => setOpen(null)}
+              aria-label="close photo"
+              className="absolute right-4 top-4 z-10 grid h-8 w-8 place-items-center rounded-full bg-ink/80 text-paper transition-transform hover:scale-110"
+            >
+              ×
+            </button>
+            <img
+              src={ev.img}
+              alt={ev.title}
+              className="max-h-[62vh] w-full rounded-lg object-contain bg-black/5"
+            />
+            <div className="mt-3 text-center font-hand text-2xl text-foreground">{ev.title}</div>
+            <div className="text-center font-mono text-[11px] uppercase tracking-widest text-muted-foreground">{ev.note} · tap anywhere to close</div>
           </div>
-        </button>
+        </div>
       )}
     </div>
   );

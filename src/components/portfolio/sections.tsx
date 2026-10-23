@@ -228,7 +228,7 @@ export function Work() {
               <Reveal key={pr.id} className="grid items-center gap-8 md:grid-cols-12 md:gap-12">
                 <div className={`md:col-span-7 ${flip ? "md:order-2" : ""}`}>
                   <Tilt max={6} className="rounded-2xl">
-                    <a href={profile.github} target="_blank" rel="noreferrer" data-hover aria-label={`${pr.name} on GitHub`}
+                    <a href={pr.live || pr.github} target="_blank" rel="noreferrer" data-hover aria-label={`${pr.name} ${pr.live ? "live project" : "on GitHub"}`}
                       className="group relative block rounded-2xl bg-paper p-3 pb-12 shadow-polaroid transition-transform duration-500 md:p-4 md:pb-14"
                       style={{ rotate: flip ? "1.5deg" : "-1.5deg" }}>
                       <span className="absolute -top-3 left-1/2 h-6 w-24 -translate-x-1/2 rotate-2 rounded-sm bg-signal/25 backdrop-blur-sm" />
@@ -265,7 +265,7 @@ export function Work() {
                     {pr.stack.map((s) => <span key={s} className="rounded-full border border-border bg-card px-3 py-1 font-mono text-[11px]">{s}</span>)}
                   </div>
                   <Magnetic className="mt-7 inline-block">
-                    <a href={profile.github} target="_blank" rel="noreferrer" className="group/b flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-ink-foreground transition-colors hover:bg-signal">
+                    <a href={pr.github} target="_blank" rel="noreferrer" className="group/b flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-ink-foreground transition-colors hover:bg-signal">
                       view case study <ArrowUpRight className="h-4 w-4 transition-transform group-hover/b:rotate-45" />
                     </a>
                   </Magnetic>

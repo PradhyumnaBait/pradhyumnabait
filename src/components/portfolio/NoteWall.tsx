@@ -12,7 +12,9 @@ const SKIN = ["oklch(0.85 0.06 60)", "oklch(0.72 0.08 55)", "oklch(0.6 0.08 50)"
 const HAIR = ["oklch(0.25 0.02 40)", "oklch(0.45 0.08 50)", "oklch(0.7 0.12 80)", "oklch(0.55 0.18 30)", "oklch(0.3 0.05 270)"];
 const BG = ["var(--note-yellow)", "var(--note-pink)", "var(--note-mint)", "var(--note-lilac)", "var(--note-blue)", "var(--note-peach)"];
 export function Avatar({ src, className = "h-8 w-8" }: { src: string | null; className?: string }) {
-  if (src && src.startsWith("data:image/")) return <img src={src} alt="" className={`${className} rounded-full object-cover`} />;
+  if (src && /^data:image\/(jpeg|png|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(src)) {
+    return <img src={src} alt="" className={`${className} rounded-full object-cover`} />;
+  }
   const n = src?.startsWith("seed:") ? Number(src.slice(5)) : (src ?? "x").length * 7;
   const pick = <T,>(a: T[], k: number) => a[(n * k + k) % a.length]!;
   const hairStyle = n % 3;
@@ -64,11 +66,28 @@ function Overlay({ onClose, children }: { onClose: () => void; children: React.R
 }
 
 function Row({ notes, dir, onOpen, tail }: { notes: PublicNote[]; dir: 1 | -1; onOpen: (n: PublicNote) => void; tail?: React.ReactNode }) {
-  const items = [...notes, ...notes];
+  if (notes.length === 0) return null;
+  // Ensure we have enough items in the sequence so the marquee covers full width smoothly
+  // Repeat the array so one full half matches the other half exactly for infinite -50% translateX loop
+  const repeatCount = Math.max(1, Math.ceil(6 / notes.length));
+  const oneHalf: PublicNote[] = [];
+  for (let r = 0; r < repeatCount; r++) {
+    oneHalf.push(...notes);
+  }
+  const items = [...oneHalf, ...oneHalf];
+
   return (
     <div className="group/row overflow-hidden py-6">
-      <div className="flex w-max gap-6 px-3 group-hover/row:[animation-play-state:paused]" style={{ animation: `marquee ${Math.max(30, notes.length * 7)}s linear infinite`, animationDirection: dir === 1 ? "normal" : "reverse" }}>
-        {items.map((n, i) => <Sticky key={n.id + i} n={n} onOpen={() => onOpen(n)} />)}
+      <div
+        className="flex w-max gap-6 px-3 group-hover/row:[animation-play-state:paused]"
+        style={{
+          animation: `marquee ${Math.max(25, oneHalf.length * 8)}s linear infinite`,
+          animationDirection: dir === 1 ? "normal" : "reverse",
+        }}
+      >
+        {items.map((n, i) => (
+          <Sticky key={`${n.id}-${i}`} n={n} onOpen={() => onOpen(n)} />
+        ))}
         {tail}
       </div>
     </div>
@@ -175,7 +194,11 @@ function NoteForm({ onDone }: { onDone: (id: string) => void }) {
     try {
       const r = await addNote({ data: { ...f, avatar } });
       if (!r.ok) { setErr(r.error); return; }
-      qc.setQueryData<PublicNote[]>(["notes"], (old) => [r.note, ...(old ?? [])]);
+      qc.setQueryData<PublicNote[]>(["notes"], (old) => {
+        const prev = old ? old.filter((n) => n.id !== r.note.id) : [];
+        return [r.note, ...prev];
+      });
+      qc.invalidateQueries({ queryKey: ["notes"] });
       const b = btn.current?.getBoundingClientRect();
       if (b) confetti(b.left + b.width / 2, b.top);
       blip(990, 0.1);

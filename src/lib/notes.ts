@@ -37,7 +37,11 @@ export function validateNote(i: NoteInput): { ok: true; value: Required<Omit<Not
   if (!body) return { ok: false, error: "Your note can't be empty." };
   if (body.length > MAX_BODY) return { ok: false, error: `Notes are max ${MAX_BODY} characters.` };
   const avatar = i.avatar ?? "";
-  if (avatar && !/^seed:\d{1,4}$/.test(avatar) && !(avatar.startsWith("data:image/") && avatar.length < 60000)) {
+  if (
+    avatar &&
+    !/^seed:\d{1,4}$/.test(avatar) &&
+    !(/^data:image\/(jpeg|png|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(avatar) && avatar.length < 60000)
+  ) {
     return { ok: false, error: "Invalid avatar." };
   }
   return {
