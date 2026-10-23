@@ -7,10 +7,13 @@ import icBrain from "@/assets/icons/brain.png";
 import aboutMe from "@/assets/about-me.png.asset.json";
 import ev1 from "@/assets/events/event-1.jpg.asset.json";
 import ev2 from "@/assets/events/event-2.jpg.asset.json";
+import ev3 from "@/assets/events/event-3.jpg.asset.json";
 import ev4 from "@/assets/events/event-4.jpg.asset.json";
 import ev5 from "@/assets/events/event-5.jpg.asset.json";
 import ev6 from "@/assets/events/event-6.jpg.asset.json";
 import ev7 from "@/assets/events/event-7.jpg.asset.json";
+import ev8 from "@/assets/events/event-8.jpg.asset.json";
+import ev9 from "@/assets/events/event-9.png.asset.json";
 
 type Msg = { from: "me" | "bot"; text: string };
 type Tab = "ask" | "about" | "log" | "hack" | "events";
@@ -194,8 +197,11 @@ const EVENTS = [
   { img: ev6.url, title: "Opening keynote", note: "Build And Grow 2.0 · auditorium" },
   { img: ev1.url, title: "Build with Google Cloud Ai and MongoDB", note: "laptops out, heads down" },
   { img: ev2.url, title: "Claude Ai Hackathon", note: "case study on stage" },
+  { img: ev3.url, title: "Hackathon Sprint", note: "in the zone" },
   { img: ev5.url, title: "Product Showcase", note: "VCET · Vasai, 2026" },
   { img: ev7.url, title: "MongoDB Mentor", note: "showing the build" },
+  { img: ev8.url, title: "Tech Community", note: "learning & sharing" },
+  { img: ev9.url, title: "Demo & Recognition", note: "building in public" },
 ];
 
 function EventsPane() {
@@ -206,7 +212,7 @@ function EventsPane() {
       <div className="mb-4 flex items-center gap-2 font-hand text-xl text-muted-foreground"><Sparkles className="h-4 w-4 text-signal" />events I've been to — tap a photo</div>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         {EVENTS.map((e, i) => (
-          <button key={e.title} onClick={() => setOpen(i)} className="group bg-paper p-2 pb-3 text-left shadow-polaroid transition-all duration-500 hover:z-10 hover:-translate-y-1 hover:rotate-0" style={{ rotate: `${[-3, 2, -1, 3, -2, 1][i]}deg` }}>
+          <button key={e.title} onClick={() => setOpen(i)} className="group bg-paper p-2 pb-3 text-left shadow-polaroid transition-all duration-500 hover:z-10 hover:-translate-y-1 hover:rotate-0" style={{ rotate: `${[-3, 2, -1, 3, -2, 1, -2, 2, -1][i % 9]}deg` }}>
             <div className="aspect-[4/3] overflow-hidden rounded-sm bg-muted">
               <img src={e.img} alt={e.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
             </div>

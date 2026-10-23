@@ -2,10 +2,7 @@
   "version": 1,
   "asset_id": "ff744ba4-25f7-453f-8950-8b9b6eb0ae66",
   "project_id": "0c08e4da-c3cd-4cb1-88c9-4bb5dfbbe186",
-  "url": "/__l5e/assets-v1/ff744ba4-25f7-453f-8950-8b9b6eb0ae66/photo-debugging.webp",
-  "r2_key": "a/v1/0c08e4da-c3cd-4cb1-88c9-4bb5dfbbe186/ff744ba4-25f7-453f-8950-8b9b6eb0ae66/photo-debugging.webp",
+  "url": "/assets/photo-debugging.webp",
   "original_filename": "photo-debugging.webp",
-  "size": 98252,
-  "content_type": "image/webp",
-  "created_at": "2026-10-23T16:53:01Z"
+  "content_type": "image/webp"
 }

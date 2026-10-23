@@ -2,10 +2,7 @@
   "version": 1,
   "asset_id": "af5a1bdb-929b-4581-8888-171cb0551726",
   "project_id": "0c08e4da-c3cd-4cb1-88c9-4bb5dfbbe186",
-  "url": "/__l5e/assets-v1/af5a1bdb-929b-4581-8888-171cb0551726/event-1.jpg",
-  "r2_key": "a/v1/0c08e4da-c3cd-4cb1-88c9-4bb5dfbbe186/af5a1bdb-929b-4581-8888-171cb0551726/event-1.jpg",
+  "url": "/assets/events/event-1.jpg",
   "original_filename": "event-1.jpg",
-  "size": 256628,
-  "content_type": "image/jpeg",
-  "created_at": "2026-10-23T16:45:07Z"
+  "content_type": "image/jpeg"
 }

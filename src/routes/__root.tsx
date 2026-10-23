@@ -84,6 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // Open Graph
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://pradhyumnabait.me" },
+      { property: "og:site_name", content: "Pradhyumna Bait" },
       { property: "og:title", content: "Pradhyumna Bait — AI/ML Engineer" },
       { property: "og:description", content: "AI systems, scalable backends and real-time pipelines from Mumbai." },
       { property: "og:image", content: "https://pradhyumnabait.me/og-image.png" },
