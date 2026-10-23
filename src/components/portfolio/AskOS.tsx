@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Send, MapPin, Mail, Trophy, CalendarDays, ImagePlus, Terminal, User, Sparkles, Briefcase } from "lucide-react";
+import { Send, MapPin, Mail, Trophy, CalendarDays, Terminal, User, Sparkles, Briefcase } from "lucide-react";
 import { profile, projects, qa } from "./data";
 import { stops } from "./journey-stops";
 import { Reveal, FloatIcon } from "./fx";
