@@ -3,14 +3,22 @@ import { getRequestHeader } from "@tanstack/react-start/server";
 import { NOTE_COLORS, PUBLIC_COLUMNS, validateNote, type NoteInput, type PublicNote } from "./notes";
 
 export const listNotes = createServerFn({ method: "GET" }).handler(async (): Promise<PublicNote[]> => {
+  const url = process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"] || process.env["NEXT_PUBLIC_SUPABASE_URL"];
+  const key = process.env["SUPABASE_PUBLISHABLE_KEY"] || process.env["SUPABASE_ANON_KEY"] || process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || process.env["NEXT_PUBLIC_SUPABASE_ANON_KEY"];
+  if (!url || !key) {
+    console.warn("[listNotes] Missing Supabase URL or Key in environment");
+    return [];
+  }
   const { createClient } = await import("@supabase/supabase-js");
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
-  const sb = createClient(process.env["SUPABASE_URL"]!, key, {
+  const sb = createClient(url, key, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
     global: { fetch: (u: RequestInfo | URL, init?: RequestInit) => { const h = new Headers(init?.headers); if (key.startsWith("sb_")) { h.delete("Authorization"); h.set("apikey", key); } return fetch(u, { ...init, headers: h }); } },
   });
   const { data, error } = await sb.from("notes").select(PUBLIC_COLUMNS).order("created_at", { ascending: false }).limit(200);
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error("[listNotes] Supabase error:", error.message);
+    return [];
+  }
   return (data ?? []) as PublicNote[];
 });
 

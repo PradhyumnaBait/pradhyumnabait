@@ -76,7 +76,7 @@ function Row({ notes, dir, onOpen, tail }: { notes: PublicNote[]; dir: 1 | -1; o
 }
 
 export function NoteWall() {
-  const { data: notes = [] } = useQuery(notesQuery);
+  const { data: notes = [], isLoading, isError } = useQuery(notesQuery);
   const [reading, setReading] = useState<PublicNote | null>(null);
   const [all, setAll] = useState(false);
   const [writing, setWriting] = useState(false);
@@ -108,7 +108,13 @@ export function NoteWall() {
       </div>
 
       <div className="mt-10">
-        {notes.length === 0 ? <div className="flex justify-center py-20 text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin" /></div> : (
+        {isLoading ? (
+          <div className="flex justify-center py-20 text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin" /></div>
+        ) : notes.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+            {empty}
+          </div>
+        ) : (
           <>
             <div key={fresh ?? "r1"} className={fresh ? "note-fly" : ""}><Row notes={r1} dir={1} onOpen={setReading} /></div>
             <Row notes={r2.length ? r2 : r1} dir={-1} onOpen={setReading} tail={empty} />
