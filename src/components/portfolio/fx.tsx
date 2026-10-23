@@ -259,7 +259,7 @@ export function StatusWidget() {
         {open && (
           <div className="mt-3 space-y-2 text-xs">
             <div className="flex justify-between"><span className="text-muted-foreground">mumbai</span><span className="font-mono">{time ?? "--:--"}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">building</span><span>TRINETRA v2</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">building</span><span>Multiple Scalable Systems</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">fuel</span><span>cutting chai ☕</span></div>
           </div>
         )}
