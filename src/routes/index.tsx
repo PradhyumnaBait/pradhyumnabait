@@ -7,15 +7,22 @@ import { JourneyMap } from "@/components/portfolio/JourneyMap";
 import { NoteWall } from "@/components/portfolio/NoteWall";
 import { Socials } from "@/components/portfolio/Socials";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/")({\
   head: () => ({
     meta: [
-      { title: "Pradhyumna Bait — AI/ML Engineer & Software Developer" },
-      { name: "description", content: "Pradhyumna Bait builds AI systems, scalable backends and real-time pipelines — MOKSHA, MEDDESK, TRINETRA." },
-      { property: "og:title", content: "Pradhyumna Bait — AI/ML Engineer" },
-      { property: "og:description", content: "AI systems, scalable backends and real-time pipelines from Mumbai." },
+      { title: "Pradhyumna Bait \u2014 AI/ML Engineer & Software Developer" },
+      { name: "description", content: "Pradhyumna Bait builds AI systems, scalable backends and real-time pipelines \u2014 MOKSHA, MEDDESK, TRINETRA." },
+      // Open Graph
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://pradhyumnabait.me" },
+      { property: "og:title", content: "Pradhyumna Bait \u2014 AI/ML Engineer" },
+      { property: "og:description", content: "AI systems, scalable backends and real-time pipelines from Mumbai." },
+      { property: "og:image", content: "https://pradhyumnabait.me/og-image.png" },
+      // Twitter / X
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Pradhyumna Bait \u2014 AI/ML Engineer" },
+      { name: "twitter:description", content: "AI systems, scalable backends and real-time pipelines from Mumbai." },
+      { name: "twitter:image", content: "https://pradhyumnabait.me/og-image.png" },
     ],
   }),
   component: Index,

@@ -81,8 +81,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Pradhyumna Bait — AI/ML Engineer" },
       { name: "description", content: "Portfolio of Pradhyumna Bait, AI/ML engineer and backend developer from Mumbai." },
       { name: "author", content: "Pradhyumna Bait" },
+      // Open Graph
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://pradhyumnabait.me" },
+      { property: "og:title", content: "Pradhyumna Bait — AI/ML Engineer" },
+      { property: "og:description", content: "AI systems, scalable backends and real-time pipelines from Mumbai." },
+      { property: "og:image", content: "https://pradhyumnabait.me/og-image.png" },
+      // Twitter / X
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Pradhyumna Bait — AI/ML Engineer" },
+      { name: "twitter:description", content: "AI systems, scalable backends and real-time pipelines from Mumbai." },
+      { name: "twitter:image", content: "https://pradhyumnabait.me/og-image.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
