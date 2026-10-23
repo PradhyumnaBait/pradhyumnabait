@@ -4,7 +4,6 @@ import { profile, projects, qa } from "./data";
 import { stops } from "./journey-stops";
 import { Reveal, FloatIcon } from "./fx";
 import icBrain from "@/assets/icons/brain.png";
-import p1 from "@/assets/polaroid-1.jpg";
 import aboutMe from "@/assets/about-me.png.asset.json";
 import ev1 from "@/assets/events/event-1.jpg.asset.json";
 import ev2 from "@/assets/events/event-2.jpg.asset.json";
