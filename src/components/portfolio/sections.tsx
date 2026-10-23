@@ -1,9 +1,9 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Github, Linkedin, Mail, Send, ArrowUp, Laptop, Cpu, Coffee, Sprout, Server, BookOpen, MousePointerClick, Plus } from "lucide-react";
 import { Drone, Controller } from "./Drone";
-import p1 from "@/assets/polaroid-1.jpg";
 import p2 from "@/assets/polaroid-2.jpg";
-import p3 from "@/assets/polaroid-3.jpg";
+import photoDesk from "@/assets/photo-debugging.webp.asset.json";
+import photoHack from "@/assets/photo-hackathon.jpg.asset.json";
 import { profile, projects, skills, qa, journey } from "./data";
 import { Tilt, Reveal, useScrollProgress, Magnetic, confetti, FloatIcon } from "./fx";
 import { deskItems } from "./desk-items";
@@ -42,9 +42,9 @@ export function Nav() {
 }
 
 const polaroids = [
-  { src: p1, cap: "usually debugging something.", r: -8, x: "0%", y: "8%" },
+  { src: photoDesk.url, cap: "usually debugging something.", r: -8, x: "0%", y: "8%" },
   { src: p2, cap: "roots: mumbai.", r: 4, x: "30%", y: "-6%" },
-  { src: p3, cap: "hackathon nights.", r: 9, x: "58%", y: "10%" },
+  { src: photoHack.url, cap: "hackathon nights.", r: 9, x: "58%", y: "10%" },
 ];
 
 export function Hero() {
