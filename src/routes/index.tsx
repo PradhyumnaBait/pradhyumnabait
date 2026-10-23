@@ -7,7 +7,7 @@ import { JourneyMap } from "@/components/portfolio/JourneyMap";
 import { NoteWall } from "@/components/portfolio/NoteWall";
 import { Socials } from "@/components/portfolio/Socials";
 
-export const Route = createFileRoute("/")({\
+export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Pradhyumna Bait \u2014 AI/ML Engineer & Software Developer" },
