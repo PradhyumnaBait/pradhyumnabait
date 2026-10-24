@@ -28,9 +28,15 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /** Returns a cleaned note or an error message. */
 export function validateNote(i: NoteInput): { ok: true; value: Required<Omit<NoteInput, "website">> } | { ok: false; error: string } {
-  const name = (i.name ?? "").trim();
-  const body = (i.body ?? "").trim();
+  // Strip dangerous HTML/script injection tags and control characters
+  const clean = (s: string) => s.replace(/[<>]/g, "").replace(/[\u0000-\u001F\u007F-\u009F]/g, "").trim();
+
+  const name = clean(i.name ?? "");
+  const body = clean(i.body ?? "");
   const email = (i.email ?? "").trim();
+  const company = clean((i.company ?? "").slice(0, 60));
+  const role = clean((i.role ?? "").slice(0, 60));
+
   if (i.website) return { ok: false, error: "spam" };
   if (!name || name.length > 60) return { ok: false, error: "Name is required (max 60)." };
   if (!email || email.length > 255 || !EMAIL.test(email)) return { ok: false, error: "A valid email is required." };
@@ -46,7 +52,7 @@ export function validateNote(i: NoteInput): { ok: true; value: Required<Omit<Not
   }
   return {
     ok: true,
-    value: { name, email, body, company: (i.company ?? "").trim().slice(0, 60), role: (i.role ?? "").trim().slice(0, 60), avatar },
+    value: { name, email, body, company, role, avatar },
   };
 }
 

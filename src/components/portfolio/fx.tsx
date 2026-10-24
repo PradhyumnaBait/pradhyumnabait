@@ -88,6 +88,7 @@ export function Cursor() {
   const ring = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (window.matchMedia("(pointer: coarse)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let x = 0, y = 0, rx = 0, ry = 0, big = false, raf = 0;
     const move = (e: MouseEvent) => {
       x = e.clientX; y = e.clientY;
@@ -105,8 +106,8 @@ export function Cursor() {
   }, []);
   return (
     <>
-      <div ref={dot} className="pointer-events-none fixed left-0 top-0 z-[100] -ml-1 -mt-1 hidden h-2 w-2 rounded-full bg-signal md:block" />
-      <div ref={ring} className="pointer-events-none fixed left-0 top-0 z-[99] -ml-4 -mt-4 hidden h-8 w-8 rounded-full border border-foreground/40 mix-blend-difference transition-[scale] md:block" />
+      <div ref={dot} className="custom-cursor pointer-events-none fixed left-0 top-0 z-[100] -ml-1 -mt-1 hidden h-2 w-2 rounded-full bg-signal md:block" />
+      <div ref={ring} className="custom-cursor pointer-events-none fixed left-0 top-0 z-[99] -ml-4 -mt-4 hidden h-8 w-8 rounded-full border border-foreground/40 mix-blend-difference transition-[scale] md:block" />
     </>
   );
 }

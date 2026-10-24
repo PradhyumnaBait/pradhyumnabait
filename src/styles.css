@@ -163,4 +163,9 @@
 .journey-preview { mask-image: radial-gradient(ellipse at center, var(--ink) 48%, transparent 73%); }
 .journey-story { animation: journey-story-in .35s ease-out; }
 @keyframes journey-story-in { from { opacity: .4; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
-@media (prefers-reduced-motion: reduce) { .journey-story { animation: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .journey-story { animation: none; }
+  body, main, a, button, [role="button"], input, textarea { cursor: auto !important; }
+  .custom-cursor { display: none !important; }
+}
+

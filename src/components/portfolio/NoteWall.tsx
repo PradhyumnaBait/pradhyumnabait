@@ -59,7 +59,7 @@ function Overlay({ onClose, children }: { onClose: () => void; children: React.R
     return () => { window.removeEventListener("keydown", k); document.documentElement.style.overflow = ""; };
   }, [onClose]);
   return (
-    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-ink/40 p-4 backdrop-blur-md animate-in fade-in" onClick={onClose}>
+    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-ink/40 p-4 backdrop-blur-md animate-in fade-in" onClick={onClose}>
       <div className="relative max-h-[90vh] w-full animate-in zoom-in-95 overflow-auto" onClick={(e) => e.stopPropagation()}>{children}</div>
     </div>
   );

@@ -31,6 +31,7 @@ function AskPane() {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [typing, setTyping] = useState(false);
   const [text, setText] = useState("");
+  const [cooldown, setCooldown] = useState(false);
   const box = useRef<HTMLDivElement>(null);
   useEffect(() => { box.current?.scrollTo({ top: box.current.scrollHeight, behavior: "smooth" }); }, [msgs, typing]);
   const reply = (q: string, a: string) => {
@@ -48,10 +49,70 @@ function AskPane() {
     }, 550);
   };
   const submit = () => {
-    const q = text.trim(); if (!q) return; setText("");
-    const words = q.toLowerCase().split(/\W+/).filter((w) => w.length > 2);
-    const hit = qa.find((x) => words.some((w) => (x.q + " " + x.a).toLowerCase().includes(w)));
-    reply(q, hit ? hit.a : "I'm on a strict diet of pre-written answers 😄 — try one of the chips, or email " + profile.email);
+    if (cooldown || typing) return;
+    const raw = text.trim();
+    if (!raw) return;
+    setText("");
+    setCooldown(true);
+    setTimeout(() => setCooldown(false), 1000);
+
+    // 1. Sanitize & Length Limit against Denial of Service / Memory payloads
+    const q = raw.slice(0, 200).replace(/[<>{}[\]\\]/g, "");
+    const lower = q.toLowerCase();
+
+    // 2. Prompt Injection & Jailbreak Defense (Rule-based deterministic firewall)
+    const injectionPatterns = [
+      /\b(ignore|disregard|forget)\s+(all|previous|prior|above)\s+(instructions|prompts|rules)/i,
+      /\b(system\s*prompt|system\s*instructions|reveal\s*your\s*prompt)\b/i,
+      /\b(you\s+are\s+now|act\s+as|pretend\s+to\s+be|dan\s+mode|jailbreak)\b/i,
+      /\b(eval\(|<script|javascript:|drop\s+table|select\s+\*|union\s+select)\b/i,
+      /\b(supabase_service_role_key|secret_key|api_key|password|env\b)\b/i,
+    ];
+
+    if (injectionPatterns.some((pattern) => pattern.test(lower))) {
+      reply(
+        q,
+        "Nice try! 🛡️ ask.exe runs on an immutable deterministic runtime — no prompts to leak, no jailbreaks, and no secrets exposed."
+      );
+      return;
+    }
+
+    // 3. Fast Greetings & Small Talk
+    if (/^(hi|hello|hey|yo|namaste|greetings)\b/i.test(lower)) {
+      reply(q, "Hey there! 👋 Feel free to ask about Pradhyumna's projects (MOKSHA, MEDDESK, TRINETRA), tech stack, achievements, or internships!");
+      return;
+    }
+
+    // 4. Intelligent Multi-keyword Weighted Matcher
+    const tokens = lower.split(/[^a-z0-9+#.]+/).filter((w) => w.length >= 2);
+    let bestScore = 0;
+    let bestItem: (typeof qa)[number] | null = null;
+
+    for (const item of qa) {
+      let score = 0;
+      const qTokens = item.q.toLowerCase().split(/[^a-z0-9+#.]+/);
+      const tagTokens = item.tags ?? [];
+
+      for (const token of tokens) {
+        if (tagTokens.includes(token)) score += 4;
+        if (qTokens.includes(token)) score += 3;
+        if (item.a.toLowerCase().includes(token)) score += 1;
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestItem = item;
+      }
+    }
+
+    if (bestItem && bestScore >= 2) {
+      reply(q, bestItem.a);
+    } else {
+      reply(
+        q,
+        `I don't have the exact answer for that yet, but you can explore my projects above, download my resume, or ping me directly at ${profile.email}!`
+      );
+    }
   };
   return (
     <div className="flex h-full flex-col">
@@ -80,13 +141,13 @@ function AskPane() {
       <div className="space-y-3 border-t border-border p-3 md:p-4">
         <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 md:flex-wrap md:justify-center">
           {qa.map((x) => (
-            <button key={x.q} onClick={() => reply(x.q, x.a)} disabled={typing} className="shrink-0 rounded-full border border-border bg-background px-3 py-1.5 text-xs transition-all hover:-translate-y-0.5 hover:border-signal hover:text-signal disabled:opacity-40">{x.q}</button>
+            <button key={x.q} onClick={() => reply(x.q, x.a)} disabled={typing || cooldown} className="shrink-0 rounded-full border border-border bg-background px-3 py-1.5 text-xs transition-all hover:-translate-y-0.5 hover:border-signal hover:text-signal disabled:opacity-40">{x.q}</button>
           ))}
         </div>
         <form onSubmit={(e) => { e.preventDefault(); submit(); }} className="mx-auto flex max-w-2xl items-center gap-2 rounded-xl border border-border bg-background px-3 py-2 focus-within:border-signal">
           <span className="font-mono text-xs text-signal">~$</span>
-          <input value={text} onChange={(e) => setText(e.target.value)} placeholder="ask anything about pradhyumna…" className="min-w-0 flex-1 bg-transparent py-1.5 text-sm outline-none placeholder:text-muted-foreground" />
-          <button type="submit" disabled={typing || !text.trim()} aria-label="send" className="grid h-9 w-9 place-items-center rounded-full bg-signal text-accent-foreground transition-transform hover:scale-105 disabled:opacity-40"><Send className="h-4 w-4" /></button>
+          <input value={text} onChange={(e) => setText(e.target.value)} placeholder={cooldown ? "throttled (1s)..." : "ask anything about pradhyumna…"} className="min-w-0 flex-1 bg-transparent py-1.5 text-sm outline-none placeholder:text-muted-foreground" />
+          <button type="submit" disabled={typing || cooldown || !text.trim()} aria-label="send" className="grid h-9 w-9 place-items-center rounded-full bg-signal text-accent-foreground transition-transform hover:scale-105 disabled:opacity-40"><Send className="h-4 w-4" /></button>
         </form>
       </div>
     </div>
@@ -237,7 +298,7 @@ function EventsPane() {
               />
             </div>
             <div className="mt-2 truncate text-center font-hand text-base leading-tight">{e.title}</div>
-            <div className="truncate text-center font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{e.note}</div>
+            <div className="truncate text-center font-mono text-[10px] uppercase tracking-widest text-zinc-600 dark:text-zinc-300">{e.note}</div>
           </button>
         ))}
       </div>
@@ -246,7 +307,7 @@ function EventsPane() {
           onClick={() => setOpen(null)}
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/75 p-4 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-[120] flex items-center justify-center bg-ink/75 p-4 backdrop-blur-sm animate-in fade-in duration-200"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -265,7 +326,7 @@ function EventsPane() {
               className="max-h-[62vh] w-full rounded-lg object-contain bg-black/5"
             />
             <div className="mt-3 text-center font-hand text-2xl text-foreground">{ev.title}</div>
-            <div className="text-center font-mono text-[11px] uppercase tracking-widest text-muted-foreground">{ev.note} · tap anywhere to close</div>
+            <div className="text-center font-mono text-[11px] uppercase tracking-widest text-zinc-600 dark:text-zinc-300">{ev.note} · tap anywhere to close</div>
           </div>
         </div>
       )}

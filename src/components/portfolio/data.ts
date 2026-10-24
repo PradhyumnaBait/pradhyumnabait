@@ -69,13 +69,72 @@ export const skills: Record<string, string[]> = {
   Concepts: ["DSA", "OOP", "DBMS", "Operating Systems", "Networks", "Software Eng."],
 };
 
-export const qa: { q: string; a: string }[] = [
-  { q: "who is pradhyumna?", a: "A Computer Science (AI & ML) student at VCET Mumbai who loves building AI products that actually hold up in the real world — fast backends, smart inference, clean architecture." },
-  { q: "what does he actually build?", a: "End-to-end systems: async pipelines, microservices, real-time data flows and AI inference. Think settlement infra (MOKSHA), clinic platforms (MEDDESK) and deepfake forensics (TRINETRA)." },
-  { q: "ai or backend?", a: "Both. He likes the seam where models meet infrastructure — getting a PyTorch model behind a FastAPI + Celery queue and making it reliable at scale." },
-  { q: "favourite stack?", a: "Python + FastAPI on the server, React on the front, Redis/Celery for anything async, Docker to ship it. C++ when it needs to be fast." },
-  { q: "hackathons?", a: "Plenty — national-level hackathons across fintech, healthtech, cybersecurity and distributed systems. He led backend for an AI healthcare app." },
-  { q: "how do I reach him?", a: "Email pradhyumna.bait@gmail.com or ping him on LinkedIn — he's open to internships and interesting collaborations." },
+export const qa: { q: string; a: string; tags?: string[] }[] = [
+  {
+    q: "who is pradhyumna?",
+    a: "A Computer Science (AI & ML) engineer at VCET Mumbai who builds real-world AI systems, high-throughput backends, and real-time distributed pipelines.",
+    tags: ["who", "about", "bio", "background", "intro", "introduction", "myself", "pradhyumna"]
+  },
+  {
+    q: "what does he actually build?",
+    a: "End-to-end production systems: async pipelines, microservices, real-time data flows, and containerized AI inference. Flagship projects include MOKSHA (fintech settlement), MEDDESK (healthtech platform), and TRINETRA (deepfake forensics).",
+    tags: ["build", "work", "projects", "systems", "portfolio", "products", "created", "shipped"]
+  },
+  {
+    q: "tell me about MOKSHA",
+    a: "MOKSHA is a real-time capital market settlement platform enabling T+0 atomic Delivery-versus-Payment with Hyperledger Fabric, UPI Block, e₹-W, and HTLC atomic rollback. Target: < 5 min settlement vs 24–48h.",
+    tags: ["moksha", "fintech", "hyperledger", "blockchain", "settlement", "trading", "stocks"]
+  },
+  {
+    q: "tell me about MEDDESK",
+    a: "MEDDESK is an AI-powered clinic management suite featuring intelligent wait-time prediction, OTP booking under 2 minutes, and automated prescription workflows, targeting 40% less patient wait time.",
+    tags: ["meddesk", "healthcare", "healthtech", "clinic", "hospital", "doctor", "patients"]
+  },
+  {
+    q: "tell me about TRINETRA",
+    a: "TRINETRA is a cross-modal deepfake detection and digital forensics engine using PyTorch, FastAPI, Celery, Redis, and C2PA provenance checks with containerized parallel inference.",
+    tags: ["trinetra", "deepfake", "forensics", "security", "pytorch", "detection", "ai security"]
+  },
+  {
+    q: "ai or backend?",
+    a: "Both! He operates right at the seam where ML models meet scalable infrastructure — taking raw PyTorch models into production with FastAPI, Celery, Redis queues, and Docker.",
+    tags: ["ai", "backend", "machine learning", "ml", "models", "deep learning"]
+  },
+  {
+    q: "favourite tech stack?",
+    a: "Python + FastAPI on the server, React/Next.js/TanStack on the web, Redis/Celery for async jobs, Docker for containers, and PostgreSQL/Supabase/MongoDB for storage. C++ when performance is paramount.",
+    tags: ["stack", "tech", "technologies", "languages", "tools", "frameworks", "python", "fastapi"]
+  },
+  {
+    q: "education & college?",
+    a: "Currently pursuing B.E. in Computer Science with specialization in AI & ML (2025–2029) at Vidyavardhini's College of Engineering and Technology (VCET), University of Mumbai.",
+    tags: ["education", "college", "university", "vcet", "degree", "study", "engineering", "student"]
+  },
+  {
+    q: "hackathons & achievements?",
+    a: "Winner at VNPS 2026, 5th place in IIT Bombay Zonal Techfest (Mesmerize), and Finalist at Horizon 1.0 & TechBlitz '26. Frequent participant and team lead in national-level AI/Fintech hackathons.",
+    tags: ["hackathon", "hackathons", "competition", "winner", "awards", "achievements", "events", "prizes"]
+  },
+  {
+    q: "are you open for hire?",
+    a: "Yes! Pradhyumna is actively looking for Summer/Fall AI & ML Engineering and Backend Development internships or collaborations. Reach out via email or LinkedIn!",
+    tags: ["hire", "hiring", "job", "internship", "intern", "role", "work with", "opportunity", "available"]
+  },
+  {
+    q: "where is he based?",
+    a: "Pradhyumna is based in Mumbai, India (IST timezone / UTC+5:30) and is open to hybrid, onsite (Mumbai), or remote opportunities globally.",
+    tags: ["location", "city", "where", "mumbai", "india", "remote", "relocate"]
+  },
+  {
+    q: "how do I reach him?",
+    a: "Direct email: pradhyumnabait22@gmail.com, or connect on LinkedIn (linkedin.com/in/pradhyumnabait) and GitHub (github.com/pradhyumnabait).",
+    tags: ["contact", "email", "reach", "message", "linkedin", "github", "phone", "chat"]
+  },
+  {
+    q: "resume & CV?",
+    a: "You can download Pradhyumna's updated resume directly from the Socials section by clicking the 'R' keycap, or download it from /assets/pradhyumna-bait-resume.pdf.",
+    tags: ["resume", "cv", "download", "pdf", "profile"]
+  },
 ];
 
 export const journey = [
