@@ -7,16 +7,16 @@ import photoHack from "@/assets/photo-hackathon.jpg.asset.json";
 import { profile, projects, skills, qa, journey } from "./data";
 import { Tilt, Reveal, useScrollProgress, Magnetic, confetti, FloatIcon } from "./fx";
 import { deskItems } from "./desk-items";
-import icLang from "@/assets/icons/languages.png";
-import icFw from "@/assets/icons/frameworks.png";
-import icDb from "@/assets/icons/databases.png";
-import icData from "@/assets/icons/data.png";
-import icTools from "@/assets/icons/tools.png";
-import icBrain from "@/assets/icons/brain.png";
-import icRocket from "@/assets/icons/rocket.png";
-import icServer from "@/assets/icons/server.png";
-import icTrophy from "@/assets/icons/trophy.png";
-import icGrad from "@/assets/icons/grad.png";
+import icLang from "@/assets/icons/languages.webp";
+import icFw from "@/assets/icons/frameworks.webp";
+import icDb from "@/assets/icons/databases.webp";
+import icData from "@/assets/icons/data.webp";
+import icTools from "@/assets/icons/tools.webp";
+import icBrain from "@/assets/icons/brain.webp";
+import icRocket from "@/assets/icons/rocket.webp";
+import icServer from "@/assets/icons/server.webp";
+import icTrophy from "@/assets/icons/trophy.webp";
+import icGrad from "@/assets/icons/grad.webp";
 import pvMoksha from "@/assets/preview-moksha.jpg";
 import pvMeddesk from "@/assets/preview-meddesk.jpg";
 import pvTrinetra from "@/assets/preview-trinetra.jpg";
@@ -49,10 +49,32 @@ const polaroids = [
 
 export function Hero() {
   const [m, setM] = useState({ x: 0, y: 0 });
+  const mRef = useRef({ x: 0, y: 0 });
+  const rafRef = useRef<number>(0);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    mRef.current = {
+      x: e.clientX / window.innerWidth - 0.5,
+      y: e.clientY / window.innerHeight - 0.5,
+    };
+    if (!rafRef.current) {
+      rafRef.current = requestAnimationFrame(() => {
+        setM(mRef.current);
+        rafRef.current = 0;
+      });
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
   return (
     <section
       id="top"
-      onMouseMove={(e) => setM({ x: e.clientX / window.innerWidth - 0.5, y: e.clientY / window.innerHeight - 0.5 })}
+      onMouseMove={handleMouseMove}
       className="grain relative flex min-h-screen flex-col justify-center overflow-hidden px-6 pt-24"
     >
       <div className="pointer-events-none absolute -left-40 top-20 h-[40rem] w-[40rem] rounded-full opacity-60 blur-3xl" style={{ background: "var(--gradient-glow)" }} />

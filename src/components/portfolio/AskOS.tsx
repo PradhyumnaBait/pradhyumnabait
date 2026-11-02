@@ -3,7 +3,7 @@ import { Send, MapPin, Mail, Trophy, CalendarDays, Terminal, User, Sparkles, Bri
 import { profile, projects, qa } from "./data";
 import { stops } from "./journey-stops";
 import { Reveal, FloatIcon } from "./fx";
-import icBrain from "@/assets/icons/brain.png";
+import icBrain from "@/assets/icons/brain.webp";
 import aboutMe from "@/assets/about-me.png.asset.json";
 import ev1 from "@/assets/events/event-1.jpg.asset.json";
 import ev2 from "@/assets/events/event-2.jpg.asset.json";

@@ -14,17 +14,36 @@ export function Tilt({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [t, setT] = useState({ x: 0, y: 0, gx: 50, gy: 50, on: false });
+  const rafRef = useRef<number>(0);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    const nextT = { x: (0.5 - py) * max * 2, y: (px - 0.5) * max * 2, gx: px * 100, gy: py * 100, on: true };
+    if (!rafRef.current) {
+      rafRef.current = requestAnimationFrame(() => {
+        setT(nextT);
+        rafRef.current = 0;
+      });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+    }
+    setT({ x: 0, y: 0, gx: 50, gy: 50, on: false });
+  };
+
   return (
     <div className="perspective" style={style}>
       <div
         ref={ref}
-        onMouseMove={(e) => {
-          const r = ref.current!.getBoundingClientRect();
-          const px = (e.clientX - r.left) / r.width;
-          const py = (e.clientY - r.top) / r.height;
-          setT({ x: (0.5 - py) * max * 2, y: (px - 0.5) * max * 2, gx: px * 100, gy: py * 100, on: true });
-        }}
-        onMouseLeave={() => setT({ x: 0, y: 0, gx: 50, gy: 50, on: false })}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
         className={`preserve-3d relative transition-transform duration-300 ease-out ${className}`}
         style={{ transform: `rotateX(${t.x}deg) rotateY(${t.y}deg) scale(${t.on ? 1.03 : 1})` }}
       >
@@ -115,9 +134,20 @@ export function Cursor() {
 export function ScrollMeter() {
   const [p, setP] = useState(0);
   useEffect(() => {
-    const on = () => setP(window.scrollY / (document.body.scrollHeight - window.innerHeight || 1));
+    let raf = 0;
+    const on = () => {
+      if (!raf) {
+        raf = requestAnimationFrame(() => {
+          setP(window.scrollY / (document.body.scrollHeight - window.innerHeight || 1));
+          raf = 0;
+        });
+      }
+    };
     window.addEventListener("scroll", on, { passive: true });
-    return () => window.removeEventListener("scroll", on);
+    return () => {
+      window.removeEventListener("scroll", on);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
   return (
     <div className="fixed right-5 top-1/2 z-50 hidden -translate-y-1/2 flex-col items-center gap-2 md:flex">
@@ -178,16 +208,35 @@ export function SoundToggle() {
 export function Magnetic({ children, strength = 0.35, className = "" }: { children: ReactNode; strength?: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [t, setT] = useState({ x: 0, y: 0 });
+  const rafRef = useRef<number>(0);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    const nextT = { x: (e.clientX - r.left - r.width / 2) * strength, y: (e.clientY - r.top - r.height / 2) * strength };
+    if (!rafRef.current) {
+      rafRef.current = requestAnimationFrame(() => {
+        setT(nextT);
+        rafRef.current = 0;
+      });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+    }
+    setT({ x: 0, y: 0 });
+  };
+
   return (
     <div
       ref={ref}
       className={`inline-block transition-transform duration-300 ease-out ${className}`}
       style={{ transform: `translate(${t.x}px, ${t.y}px)` }}
-      onMouseMove={(e) => {
-        const r = ref.current!.getBoundingClientRect();
-        setT({ x: (e.clientX - r.left - r.width / 2) * strength, y: (e.clientY - r.top - r.height / 2) * strength });
-      }}
-      onMouseLeave={() => setT({ x: 0, y: 0 })}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
     >
       {children}
     </div>

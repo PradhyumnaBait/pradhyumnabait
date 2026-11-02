@@ -12,4 +12,19 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("node_modules")) {
+              if (id.includes("@react-three") || id.includes("three")) return "vendor-three";
+              if (id.includes("@supabase")) return "vendor-supabase";
+              if (id.includes("lucide-react")) return "vendor-lucide";
+            }
+          },
+        },
+      },
+    },
+  },
 });
