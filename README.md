@@ -1,3 +1,4 @@
+My Off Campus code : X3YXHR
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&text=Pradhyumna%20Bait&fontSize=70&animation=fadeIn&fontAlignY=30&fontAlignX=50&color=gradient&height=220&desc=Full%20Stack%20Engineer%20%26%20Product%20Builder" alt="Pradhyumna Bait banner" width="100%" />
 </p>
